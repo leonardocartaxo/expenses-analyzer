@@ -1,35 +1,52 @@
 package user
 
-type users map[string]User
+import "gorm.io/gorm"
 
 type Repository struct {
-	users users
+	db *gorm.DB
 }
 
-func NewRepository(users *map[string]User) *Repository {
-	return &Repository{users: *users}
+func NewRepository(db *gorm.DB) *Repository {
+	return &Repository{db: db}
 }
 
-func (r *Repository) Save(user User) User {
-	r.users[user.ID] = user
+func (r *Repository) Save(user *CreateDTO) (*Model, error) {
+	model := &Model{Name: user.Name}
+	if err := r.db.Create(model).Error; err != nil {
+		return nil, err
+	}
 
-	return user
+	return model, nil
 }
 
-func (r *Repository) Update(user User) User {
-	r.users[user.ID] = user
+func (r *Repository) UpdateOne(id string, user *UpdateDTO) error {
+	err := r.db.Model(&Model{}).Where("ID = ?", id).Updates(user).Error
 
-	return user
+	return err
 }
 
-func (r *Repository) FindOne(id string) User {
-	return r.users[id]
+func (r *Repository) FindOne(id string) (*Model, error) {
+	model := &Model{}
+	if err := r.db.Where("ID = ?", id).First(&model).Error; err != nil {
+		return nil, err
+	}
+
+	return model, nil
 }
 
-func (r *Repository) All() map[string]User {
-	return r.users
+func (r *Repository) DeleteOne(id string) error {
+	model := &Model{}
+	err := r.db.Where("ID = ?", id).Delete(&model).Error
+
+	return err
 }
 
-//func (r *Repository) find(query string) []User {
-//	return r.users
-//}
+func (r *Repository) All() ([]*Model, error) {
+	//models := make([]*Model, 0)
+	var models []*Model
+	if err := r.db.Find(&models).Error; err != nil {
+		return nil, err
+	}
+
+	return models, nil
+}

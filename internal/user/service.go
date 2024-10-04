@@ -1,10 +1,5 @@
 package user
 
-import (
-	"maps"
-	"slices"
-)
-
 type Service struct {
 	repository *Repository
 }
@@ -13,23 +8,49 @@ func NewService(repository *Repository) *Service {
 	return &Service{repository: repository}
 }
 
-func (a *Service) Save(name string) User {
-	newUser := New(name)
-	user := a.repository.Save(*newUser)
+func (s *Service) Save(createDTO *CreateDTO) (*DTO, error) {
+	dto, err := s.repository.Save(createDTO)
+	if err != nil {
+		return nil, err
+	}
 
-	return user
+	return dto.ToDTO(), nil
 }
 
-func (a *Service) FindOne(id string) User {
-	user := a.repository.FindOne(id)
+func (s *Service) FindOne(id string) (*DTO, error) {
+	dto, err := s.repository.FindOne(id)
+	if err != nil {
+		return nil, err
+	}
 
-	return user
+	return dto.ToDTO(), nil
 }
 
-func (a *Service) All() []User {
-	allMap := a.repository.All()
-	allIter := maps.Values(allMap)
-	allSlices := slices.Collect(allIter)
+func (s *Service) UpdateOne(id string, updateDTO *UpdateDTO) (*DTO, error) {
+	err := s.repository.UpdateOne(id, updateDTO)
+	if err != nil {
+		return nil, err
+	}
 
-	return allSlices
+	dto, err := s.FindOne(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return dto, nil
+}
+
+func (s *Service) DeleteOne(id string) error {
+	err := s.repository.DeleteOne(id)
+
+	return err
+}
+
+func (s *Service) All() ([]*Model, error) {
+	all, err := s.repository.All()
+	if err != nil {
+		return nil, err
+	}
+
+	return all, nil
 }

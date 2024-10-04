@@ -9,6 +9,6 @@ type Expense struct {
 	ID        string
 	CreatedAt time.Time
 	UserId    int
-	User      user.User
+	User      user.DTO
 	Value     float64
 }
