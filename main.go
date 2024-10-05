@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/leonardocartaxo/expenses-analyzer/internal"
 	"github.com/leonardocartaxo/expenses-analyzer/internal/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -11,8 +12,10 @@ import (
 )
 
 func main() {
+	c := internal.NewServerConfig()
+	addr := fmt.Sprintf(":%d", c.Port)
 	const fmtDBString = "host=%s user=%s password=%s dbname=%s port=%d sslmode=disable"
-	dbString := fmt.Sprintf(fmtDBString, "localhost", "postgres", "postgres", "expenses_analyzer", 5432)
+	dbString := fmt.Sprintf(fmtDBString, c.DB.Host, c.DB.User, c.DB.Pass, c.DB.Name, c.DB.Port)
 	db, err := gorm.Open(postgres.Open(dbString), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
@@ -27,7 +30,6 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Route("/users", userRouter.Route)
-	addr := ":3000"
 	fmt.Printf("Starting GO API service at %s ...\n", addr)
 	fmt.Println(`
 		 ______     ______        ______     ______   __    
@@ -35,7 +37,7 @@ func main() {
 		\ \ \__ \  \ \ \/\ \     \ \  __ \  \ \  _-/ \ \ \  
 		 \ \_____\  \ \_____\     \ \_\ \_\  \ \_\    \ \_\ 
 		  \/_____/   \/_____/      \/_/\/_/   \/_/     \/_/ `)
-	err = http.ListenAndServe(":3000", r)
+	err = http.ListenAndServe(addr, r)
 	if err != nil {
 		panic(err)
 	}

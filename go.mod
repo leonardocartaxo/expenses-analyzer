@@ -6,6 +6,8 @@ require (
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-chi/render v1.0.3
 	github.com/google/uuid v1.6.0
+	github.com/joeshaw/envdecode v0.0.0-20200121155833-099f1fc765bd
+	github.com/joho/godotenv v1.5.1
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.12
 )
