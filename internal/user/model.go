@@ -47,10 +47,6 @@ func (m *Models) ToDTO() []*DTO {
 		dtos = append(dtos, model.ToDTO())
 	}
 
-	//if dtos == nil {
-	//	dtos = []*DTO{}
-	//}
-
 	return dtos
 }
 
