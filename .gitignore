@@ -1,0 +1,10 @@
+
+# Mac garbage
+.DS_store
+
+# Visual Studio Workspace
+.vscode/*
+!.vscode/extensions.json
+
+# Intellij Workspace
+.idea/*

@@ -6,6 +6,8 @@ require (
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-chi/render v1.0.3
 	github.com/google/uuid v1.6.0
+	gorm.io/driver/postgres v1.5.9
+	gorm.io/gorm v1.25.12
 )
 
 require (
@@ -19,6 +21,4 @@ require (
 	golang.org/x/crypto v0.27.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/text v0.18.0 // indirect
-	gorm.io/driver/postgres v1.5.9 // indirect
-	gorm.io/gorm v1.25.12 // indirect
 )

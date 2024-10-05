@@ -3,38 +3,56 @@ package user
 import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"net/http"
 	"time"
 )
 
 type DTO struct {
 	ID        string    `json:"id"`
-	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
-	DeletedAt time.Time `json:"deletedAt"`
+	Name      string    `json:"name"`
 }
 
 type Model struct {
 	//gorm.Model
-	uuid.UUID `gorm:"primarykey"`
+	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid()"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt
-	Name      string
+	Name      string `gorm:"uniqueIndex"`
+}
+
+type Models []*Model
+
+type Tabler interface {
+	TableName() string
+}
+
+func (Model) TableName() string {
+	return "users"
 }
 
 func (m *Model) ToDTO() *DTO {
 	return &DTO{
-		ID:        m.UUID.String(),
+		ID:        m.ID.String(),
 		Name:      m.Name,
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
-		DeletedAt: m.DeletedAt.Time,
 	}
 }
 
-//func (m []*Model) ToDTO() []*DTO  {}
+func (m *Models) ToDTO() []*DTO {
+	dtos := []*DTO{}
+	for _, model := range *m {
+		dtos = append(dtos, model.ToDTO())
+	}
+
+	//if dtos == nil {
+	//	dtos = []*DTO{}
+	//}
+
+	return dtos
+}
 
 type CreateDTO struct {
 	Name string `json:"name"`
@@ -42,22 +60,4 @@ type CreateDTO struct {
 
 type UpdateDTO struct {
 	CreateDTO
-}
-
-func (u DTO) Bind(r *http.Request) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func New(name string) *DTO {
-	return &DTO{ID: uuid.New().String(), Name: name, CreatedAt: time.Now()}
-}
-
-type myObg struct {
-	f1 string
-	f2 int
-}
-
-func New2(obg myObg, myVar string) int {
-	return obg.f2
 }

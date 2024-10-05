@@ -12,7 +12,7 @@ import (
 
 func main() {
 	const fmtDBString = "host=%s user=%s password=%s dbname=%s port=%d sslmode=disable"
-	dbString := fmt.Sprintf(fmtDBString, "db", "postgres", "postgres", "expenses-analyzer", 5432)
+	dbString := fmt.Sprintf(fmtDBString, "localhost", "postgres", "postgres", "expenses_analyzer", 5432)
 	db, err := gorm.Open(postgres.Open(dbString), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
@@ -29,6 +29,12 @@ func main() {
 	r.Route("/users", userRouter.Route)
 	addr := ":3000"
 	fmt.Printf("Starting GO API service at %s ...\n", addr)
+	fmt.Println(`
+		 ______     ______        ______     ______   __    
+		/\  ___\   /\  __ \      /\  __ \   /\  == \ /\ \   
+		\ \ \__ \  \ \ \/\ \     \ \  __ \  \ \  _-/ \ \ \  
+		 \ \_____\  \ \_____\     \ \_\ \_\  \ \_\    \ \_\ 
+		  \/_____/   \/_____/      \/_/\/_/   \/_/     \/_/ `)
 	err = http.ListenAndServe(":3000", r)
 	if err != nil {
 		panic(err)
