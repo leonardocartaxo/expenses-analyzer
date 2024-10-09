@@ -2,7 +2,7 @@
 
 Pet project for learning Golang and maybe a boilerplate for future projects
 
-## RUN API docs
+## Run
 ```shell
 go run cmd/api/main.go
 ```
