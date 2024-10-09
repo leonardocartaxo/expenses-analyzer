@@ -2,6 +2,11 @@
 
 Pet project for learning Golang and maybe a boilerplate for future projects
 
+## RUN API docs
+```shell
+go run cmd/api/main.go
+```
+
 ## Update API docs
 ```shell
 ./scripts/gen_doc.sh
