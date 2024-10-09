@@ -2,11 +2,27 @@
 
 Pet project for learning Golang and maybe a boilerplate for future projects
 
-**TODO**
+## Update API docs
+```shell
+./scripts/gen_doc.sh
+```
+
+## Migrations
+### Sync DB
+```shell
+go run cmd/migrate/main.go up
+```
+Or use auto migrate by setting env var to `DB_AUTO_MIGRATE=true`
+
+### Generate an migration DB
+```shell
+go run cmd/migrate/main.go create <migration name> sql
+```
+
+## **TODO**
+* unit tests
+* e2e test
 * logger
-* authentication
-* DB migrations
-* migrate to GIN ?
 * docker, docker compose
-* open api
-* swagger
+* authentication
+* migrate to GIN ?

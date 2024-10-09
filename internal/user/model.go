@@ -14,12 +14,12 @@ type DTO struct {
 }
 
 type Model struct {
-	//gorm.Model
+	gorm.Model
 	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid()"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt
-	Name      string `gorm:"uniqueIndex"`
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+	Name      string         `gorm:"uniqueIndex"`
 }
 
 type Models []*Model

@@ -14,15 +14,6 @@ func NewRouter(db *gorm.DB) *Router {
 }
 
 func (l *Router) Route(r chi.Router) {
-	//usersArr := []DTO{
-	//	*New("John Doe"),
-	//	*New("Alice"),
-	//	*New("Bob"),
-	//}
-	//usersMap := map[string]DTO{}
-	//for _, it := range usersArr {
-	//	usersMap[it.ID] = it
-	//}
 	repo := NewRepository(l.db)
 	service := NewService(repo)
 	api := NewApi(service)
