@@ -21,8 +21,8 @@ func (w responseBodyWriter) Write(b []byte) (int, error) {
 	return w.ResponseWriter.Write(b)
 }
 
-// LogRequestResponseMiddleware logs both the request and response
-func LogRequestResponseMiddleware(logger *slog.Logger) gin.HandlerFunc {
+// LogRequestMiddleware logs the details of the request
+func LogRequestMiddleware(logger *slog.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Extract request headers
 		headers := make(map[string][]string)
@@ -30,25 +30,37 @@ func LogRequestResponseMiddleware(logger *slog.Logger) gin.HandlerFunc {
 			headers[k] = v
 		}
 
-		// Read and log the request body (for POST and PUT requests)
+		// Read and parse the request body (for POST and PUT requests)
 		var requestBody interface{}
 		if c.Request.Method == http.MethodPost || c.Request.Method == http.MethodPut {
 			bodyBytes, err := io.ReadAll(c.Request.Body)
 			if err != nil {
 				logger.Error("Error reading request body", "error", err)
-				c.Next()
 				return
 			}
 
 			// Try to parse the body as JSON
 			if json.Unmarshal(bodyBytes, &requestBody) != nil {
-				requestBody = string(bodyBytes) // If not valid JSON, log as string
+				requestBody = string(bodyBytes) // Log as string if not valid JSON
 			}
 
 			// Reassign the body back to the request so it can be read again
 			c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 		}
 
+		// Log the request
+		logger.InfoContext(context.TODO(), "Request received",
+			"method", c.Request.Method,
+			"path", c.Request.URL.Path,
+			"headers", headers,
+			"body", requestBody,
+		)
+	}
+}
+
+// LogResponseMiddleware logs the details of the response
+func LogResponseMiddleware(logger *slog.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		// Capture the response body
 		responseWriter := &responseBodyWriter{
 			body:           bytes.NewBufferString(""),
@@ -56,28 +68,22 @@ func LogRequestResponseMiddleware(logger *slog.Logger) gin.HandlerFunc {
 		}
 		c.Writer = responseWriter
 
-		// Continue with the request processing
+		// Process the request
 		c.Next()
 
 		// Try to parse the response body as JSON
 		var responseBody interface{}
 		responseBytes := responseWriter.body.Bytes()
 		if json.Unmarshal(responseBytes, &responseBody) != nil {
-			responseBody = string(responseBytes) // If not valid JSON, log as string
+			responseBody = string(responseBytes) // Log as string if not valid JSON
 		}
 
-		// Log the request and response in structured and nested fields
-		logger.InfoContext(context.TODO(), "Request and response",
-			"request", slog.GroupValue(
-				slog.String("method", c.Request.Method),
-				slog.String("path", c.Request.URL.Path),
-				slog.Any("headers", headers),
-				slog.Any("body", requestBody),
-			),
-			"response", slog.GroupValue(
-				slog.Int("status", c.Writer.Status()),
-				slog.Any("body", responseBody),
-			),
+		// Log the response
+		logger.InfoContext(context.TODO(), "Response sent",
+			"method", c.Request.Method,
+			"path", c.Request.URL.Path,
+			"status", c.Writer.Status(),
+			"response_body", responseBody,
 		)
 	}
 }
