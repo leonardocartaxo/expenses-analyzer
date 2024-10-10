@@ -1,5 +1,10 @@
 basePath: /
 definitions:
+  user.CreateDTO:
+    properties:
+      name:
+        type: string
+    type: object
   user.DTO:
     properties:
       createdAt:
@@ -11,9 +16,14 @@ definitions:
       updatedAt:
         type: string
     type: object
+  user.UpdateDTO:
+    properties:
+      name:
+        type: string
+    type: object
 externalDocs:
   description: OpenAPI
-host: localhost:3000
+host: localhost:8080
 info:
   contact:
     email: support@swagger.io
@@ -55,6 +65,13 @@ paths:
       consumes:
       - application/json
       description: Save a user by giver form
+      parameters:
+      - description: Add User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.CreateDTO'
       produces:
       - application/json
       responses:
@@ -77,7 +94,7 @@ paths:
         in: path
         name: id
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -94,7 +111,7 @@ paths:
       summary: Find one an User
       tags:
       - users
-    put:
+    post:
       consumes:
       - application/json
       description: Update one User by ID
@@ -103,7 +120,13 @@ paths:
         in: path
         name: id
         required: true
-        type: integer
+        type: string
+      - description: Update User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.UpdateDTO'
       produces:
       - application/json
       responses:

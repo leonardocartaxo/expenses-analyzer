@@ -1,24 +1,26 @@
 package user
 
 import (
-	"github.com/go-chi/chi/v5"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type Router struct {
 	db *gorm.DB
+	rg *gin.RouterGroup
 }
 
-func NewRouter(db *gorm.DB) *Router {
-	return &Router{db: db}
+func NewRouter(db *gorm.DB, rg *gin.RouterGroup) *Router {
+	return &Router{db: db, rg: rg}
 }
 
-func (l *Router) Route(r chi.Router) {
-	repo := NewRepository(l.db)
+func (r *Router) Route() {
+	repo := NewRepository(r.db)
 	service := NewService(repo)
 	api := NewApi(service)
-	r.Post("/", api.Save)
-	r.Get("/{id}", api.FindOne)
-	r.Post("/{id}", api.UpdateOne)
-	r.Get("/", api.All)
+
+	r.rg.POST("/", api.Save)
+	r.rg.GET("/:id", api.FindOne)
+	r.rg.POST("/:id", api.UpdateOne)
+	r.rg.GET("/", api.All)
 }

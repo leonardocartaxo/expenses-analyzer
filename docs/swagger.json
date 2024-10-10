@@ -15,7 +15,7 @@
         },
         "version": "0.1"
     },
-    "host": "localhost:3000",
+    "host": "localhost:8080",
     "basePath": "/",
     "paths": {
         "/users": {
@@ -64,6 +64,17 @@
                     "users"
                 ],
                 "summary": "Save User",
+                "parameters": [
+                    {
+                        "description": "Add User",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.CreateDTO"
+                        }
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -92,7 +103,7 @@
                 "summary": "Find one an User",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "User ID",
                         "name": "id",
                         "in": "path",
@@ -117,7 +128,7 @@
                     }
                 }
             },
-            "put": {
+            "post": {
                 "description": "Update one User by ID",
                 "consumes": [
                     "application/json"
@@ -131,11 +142,20 @@
                 "summary": "Update one an User",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "User ID",
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Update User",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UpdateDTO"
+                        }
                     }
                 ],
                 "responses": {
@@ -159,6 +179,14 @@
         }
     },
     "definitions": {
+        "user.CreateDTO": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "user.DTO": {
             "type": "object",
             "properties": {
@@ -172,6 +200,14 @@
                     "type": "string"
                 },
                 "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.UpdateDTO": {
+            "type": "object",
+            "properties": {
+                "name": {
                     "type": "string"
                 }
             }

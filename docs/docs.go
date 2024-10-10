@@ -70,6 +70,17 @@ const docTemplate = `{
                     "users"
                 ],
                 "summary": "Save User",
+                "parameters": [
+                    {
+                        "description": "Add User",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.CreateDTO"
+                        }
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -98,7 +109,7 @@ const docTemplate = `{
                 "summary": "Find one an User",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "User ID",
                         "name": "id",
                         "in": "path",
@@ -123,7 +134,7 @@ const docTemplate = `{
                     }
                 }
             },
-            "put": {
+            "post": {
                 "description": "Update one User by ID",
                 "consumes": [
                     "application/json"
@@ -137,11 +148,20 @@ const docTemplate = `{
                 "summary": "Update one an User",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "User ID",
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Update User",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UpdateDTO"
+                        }
                     }
                 ],
                 "responses": {
@@ -165,6 +185,14 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "user.CreateDTO": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "user.DTO": {
             "type": "object",
             "properties": {
@@ -181,6 +209,14 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "user.UpdateDTO": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
         }
     },
     "externalDocs": {
@@ -191,7 +227,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "0.1",
-	Host:             "localhost:3000",
+	Host:             "localhost:8080",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Expenses Analyser",

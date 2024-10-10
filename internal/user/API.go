@@ -1,9 +1,7 @@
 package user
 
 import (
-	"encoding/json"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
+	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
@@ -15,33 +13,28 @@ func NewApi(service *Service) *API {
 	return &API{service: service}
 }
 
-func sendInternalServerError(w http.ResponseWriter) {
-	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-}
-
 // SaveUser godoc
 // @Summary      Save User
 // @Description  Save a user by giver form
 // @Tags         users
 // @Accept       json
 // @Produce      json
+// @Param		 user	body	CreateDTO	true	"Add User"
 // @Success      201  {object}  DTO
 // @Failure      500
 // @Router       /users [post]
-func (a *API) Save(w http.ResponseWriter, r *http.Request) {
+func (a *API) Save(c *gin.Context) {
 	createDTO := &CreateDTO{}
-	if err := json.NewDecoder(r.Body).Decode(createDTO); err != nil {
-		sendInternalServerError(w)
-		return
+	err := c.ShouldBindJSON(createDTO)
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
 	}
 	newUser, err := a.service.Save(createDTO)
 	if err != nil {
-		sendInternalServerError(w)
-		return
+		c.Status(http.StatusInternalServerError)
 	}
 
-	render.Status(r, http.StatusCreated)
-	render.JSON(w, r, newUser)
+	c.JSON(http.StatusCreated, newUser)
 }
 
 // FindOneUser godoc
@@ -50,22 +43,20 @@ func (a *API) Save(w http.ResponseWriter, r *http.Request) {
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Param        id   path      int  true  "User ID"
+// @Param        id   path      string  true  "User ID"
 // @Success      200  {object}  DTO
 // @Failure      400
 // @Failure      404
 // @Failure      500
 // @Router       /users/{id} [get]
-func (a *API) FindOne(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+func (a *API) FindOne(c *gin.Context) {
+	id := c.Param("id")
 	user, err := a.service.FindOne(id)
 	if err != nil {
-		//render.NoContent(w, r)
-		render.Status(r, http.StatusNotFound)
-		//return
+		c.Status(http.StatusNotFound)
 	}
 
-	render.JSON(w, r, user)
+	c.JSON(http.StatusOK, user)
 }
 
 // UpdateOneUser godoc
@@ -74,24 +65,25 @@ func (a *API) FindOne(w http.ResponseWriter, r *http.Request) {
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Param        id   path      int  true  "User ID"
+// @Param        id   path      string  true  "User ID"
+// @Param        user   body	UpdateDTO  true  "Update User"
 // @Success      200  {object}  DTO
 // @Failure      400
 // @Failure      404
 // @Failure      500
-// @Router       /users/{id} [put]
-func (a *API) UpdateOne(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+// @Router       /users/{id} [post]
+func (a *API) UpdateOne(c *gin.Context) {
+	id := c.Param("id")
 	updateDTO := &UpdateDTO{}
-	if err := json.NewDecoder(r.Body).Decode(updateDTO); err != nil {
-		sendInternalServerError(w)
+	err := c.ShouldBindJSON(updateDTO)
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
 	}
 	user, err := a.service.UpdateOne(id, updateDTO)
 	if err != nil {
-		//TODO
-		return
+		c.Status(http.StatusInternalServerError)
 	}
-	render.JSON(w, r, user)
+	c.JSON(http.StatusOK, user)
 }
 
 // FindOneUser godoc
@@ -105,12 +97,11 @@ func (a *API) UpdateOne(w http.ResponseWriter, r *http.Request) {
 // @Failure      404
 // @Failure      500
 // @Router       /users [get]
-func (a *API) All(w http.ResponseWriter, r *http.Request) {
+func (a *API) All(c *gin.Context) {
 	dtos, err := a.service.All()
 	if err != nil {
-		sendInternalServerError(w)
-		return
+		c.Status(http.StatusInternalServerError)
 	}
 
-	render.JSON(w, r, dtos)
+	c.JSON(http.StatusOK, dtos)
 }

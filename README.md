@@ -25,9 +25,10 @@ go run cmd/migrate/main.go create <migration name> sql
 ```
 
 ## **TODO**
+* logger
+* expenses route
 * unit tests
 * e2e test
-* logger
 * docker, docker compose
 * authentication
-* migrate to GIN ?
+* graphql
