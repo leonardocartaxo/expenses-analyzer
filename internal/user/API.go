@@ -2,15 +2,17 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
+	"log/slog"
 	"net/http"
 )
 
 type API struct {
 	service *Service
+	l       *slog.Logger
 }
 
-func NewApi(service *Service) *API {
-	return &API{service: service}
+func NewApi(service *Service, l *slog.Logger) *API {
+	return &API{service: service, l: l}
 }
 
 // SaveUser godoc
@@ -98,6 +100,7 @@ func (a *API) UpdateOne(c *gin.Context) {
 // @Failure      500
 // @Router       /users [get]
 func (a *API) All(c *gin.Context) {
+	a.l.Debug(`Debug test log`)
 	dtos, err := a.service.All()
 	if err != nil {
 		c.Status(http.StatusInternalServerError)

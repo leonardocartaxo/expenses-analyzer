@@ -7,7 +7,9 @@ Pet project for learning Golang and maybe a boilerplate for future projects
 go run cmd/api/main.go
 ```
 
-## Update API docs
+## Docs
+http://localhost:8080/swagger
+### Update API docs
 ```shell
 ./scripts/gen_doc.sh
 ```
@@ -24,9 +26,8 @@ Or use auto migrate by setting env var to `DB_AUTO_MIGRATE=true`
 go run cmd/migrate/main.go create <migration name> sql
 ```
 
-## **TODO**
-* logger
-* expenses route
+## TODO
+* expenses module
 * unit tests
 * e2e test
 * docker, docker compose

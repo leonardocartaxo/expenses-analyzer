@@ -1,11 +1,14 @@
 package user
 
+import "log/slog"
+
 type Service struct {
 	repository *Repository
+	l          *slog.Logger
 }
 
-func NewService(repository *Repository) *Service {
-	return &Service{repository: repository}
+func NewService(repository *Repository, l *slog.Logger) *Service {
+	return &Service{repository: repository, l: l}
 }
 
 func (s *Service) Save(createDTO *CreateDTO) (*DTO, error) {

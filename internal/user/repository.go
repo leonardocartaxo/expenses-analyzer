@@ -1,13 +1,17 @@
 package user
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"log/slog"
+)
 
 type Repository struct {
 	db *gorm.DB
+	l  *slog.Logger
 }
 
-func NewRepository(db *gorm.DB) *Repository {
-	return &Repository{db: db}
+func NewRepository(db *gorm.DB, l *slog.Logger) *Repository {
+	return &Repository{db: db, l: l}
 }
 
 func (r *Repository) Save(user *CreateDTO) (*Model, error) {
@@ -42,7 +46,6 @@ func (r *Repository) DeleteOne(id string) error {
 }
 
 func (r *Repository) All() ([]*Model, error) {
-	//models := make([]*Model, 0)
 	var models []*Model
 	if err := r.db.Find(&models).Error; err != nil {
 		return nil, err

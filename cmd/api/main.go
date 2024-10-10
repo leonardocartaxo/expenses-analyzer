@@ -7,6 +7,7 @@ import (
 	"github.com/leonardocartaxo/expenses-analyzer/internal"
 	"github.com/leonardocartaxo/expenses-analyzer/internal/expense"
 	"github.com/leonardocartaxo/expenses-analyzer/internal/user"
+	"github.com/leonardocartaxo/expenses-analyzer/internal/utils"
 	swaggerFiles "github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
 	"gorm.io/driver/postgres"
@@ -32,6 +33,7 @@ import (
 // @externalDocs.description  OpenAPI
 func main() {
 	c := internal.NewConfig()
+	l := utils.NewLogger(c.LogLevel)
 	addr := fmt.Sprintf(":%d", c.Server.Port)
 	const fmtDBString = "host=%s user=%s password=%s dbname=%s port=%d sslmode=disable"
 	dbString := fmt.Sprintf(fmtDBString, c.DB.Host, c.DB.User, c.DB.Pass, c.DB.Name, c.DB.Port)
@@ -65,9 +67,11 @@ func main() {
 	}
 	gin.SetMode(ginMode)
 	r := gin.Default()
+	// Use the custom middleware and pass the logger
+	r.Use(utils.LogRequestResponseMiddleware(l))
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	users := r.Group("/users")
-	user.NewRouter(db, users).Route()
+	user.NewRouter(db, users, l).Route()
 	err = r.Run(addr)
 	if err != nil {
 		panic(err)

@@ -3,21 +3,23 @@ package user
 import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"log/slog"
 )
 
 type Router struct {
 	db *gorm.DB
 	rg *gin.RouterGroup
+	l  *slog.Logger
 }
 
-func NewRouter(db *gorm.DB, rg *gin.RouterGroup) *Router {
-	return &Router{db: db, rg: rg}
+func NewRouter(db *gorm.DB, rg *gin.RouterGroup, l *slog.Logger) *Router {
+	return &Router{db: db, rg: rg, l: l}
 }
 
 func (r *Router) Route() {
-	repo := NewRepository(r.db)
-	service := NewService(repo)
-	api := NewApi(service)
+	repo := NewRepository(r.db, r.l)
+	service := NewService(repo, r.l)
+	api := NewApi(service, r.l)
 
 	r.rg.POST("/", api.Save)
 	r.rg.GET("/:id", api.FindOne)
