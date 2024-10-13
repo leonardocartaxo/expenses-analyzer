@@ -68,6 +68,7 @@ func main() {
 	gin.SetMode(ginMode)
 	r := gin.Default()
 	// Use the custom middleware and pass the logger
+	r.Use(utils.SetRequestIDMiddleware())
 	r.Use(utils.LogRequestMiddleware(l))
 	r.Use(utils.LogResponseMiddleware(l))
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

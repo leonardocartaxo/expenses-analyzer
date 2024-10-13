@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/teris-io/shortid"
 	"io"
 	"log/slog"
 	"net/http"
@@ -19,6 +20,19 @@ type responseBodyWriter struct {
 func (w responseBodyWriter) Write(b []byte) (int, error) {
 	w.body.Write(b) // Capture the response body
 	return w.ResponseWriter.Write(b)
+}
+
+// SetRequestIDMiddleware to set a unique short request ID
+func SetRequestIDMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		requestID, err := shortid.Generate()
+		if err != nil {
+			requestID = "unknown" // Fallback in case of error
+		}
+		c.Set("request_id", requestID)                   // Store request_id in the Gin context
+		c.Writer.Header().Set("X-Request-ID", requestID) // Optionally add it to response headers
+		c.Next()
+	}
 }
 
 // LogRequestMiddleware logs the details of the request
