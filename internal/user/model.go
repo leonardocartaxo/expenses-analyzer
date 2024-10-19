@@ -22,6 +22,12 @@ type Model struct {
 	Name      string         `gorm:"uniqueIndex"`
 }
 
+type FindOptions struct {
+	Name  string
+	Start string
+	End   string
+}
+
 type Models []*Model
 
 type Tabler interface {

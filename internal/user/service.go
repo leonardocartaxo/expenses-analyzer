@@ -58,3 +58,13 @@ func (s *Service) All() ([]*DTO, error) {
 
 	return models.ToDTO(), nil
 }
+
+func (s *Service) Find(options FindOptions) ([]*DTO, error) {
+	var models Models
+	models, err := s.repository.Find(options)
+	if err != nil {
+		return nil, err
+	}
+
+	return models.ToDTO(), nil
+}

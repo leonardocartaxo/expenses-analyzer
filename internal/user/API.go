@@ -88,20 +88,24 @@ func (a *API) UpdateOne(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// FindOneUser godoc
-// @Summary      List all Users
-// @Description  List all User by ID
+// FilterUsers godoc
+// @Summary      Filter Users
+// @Description  Filter Users by query paramenters
 // @Tags         users
 // @Accept       json
 // @Produce      json
+// @Param        name   query      string  false  "User name"
+// @Param        start   query      string  false  "User createdAt start date"
+// @Param        end   query      string  false  "User createdAt end date"
 // @Success      200  {object}  []DTO
 // @Failure      400
-// @Failure      404
 // @Failure      500
 // @Router       /users [get]
-func (a *API) All(c *gin.Context) {
-	a.l.Debug(`Debug test log`)
-	dtos, err := a.service.All()
+func (a *API) Find(c *gin.Context) {
+	name := c.Query("name")
+	start := c.Param("start")
+	end := c.Param("end")
+	dtos, err := a.service.Find(FindOptions{Name: name, Start: start, End: end})
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
 	}

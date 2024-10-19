@@ -26,7 +26,7 @@ const docTemplate = `{
     "paths": {
         "/users": {
             "get": {
-                "description": "List all User by ID",
+                "description": "Filter Users by query paramenters",
                 "consumes": [
                     "application/json"
                 ],
@@ -36,7 +36,27 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "List all Users",
+                "summary": "Filter Users",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User name",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "User createdAt start date",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "User createdAt end date",
+                        "name": "end",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -49,9 +69,6 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "Not Found"
                     },
                     "500": {
                         "description": "Internal Server Error"

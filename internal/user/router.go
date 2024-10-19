@@ -24,5 +24,5 @@ func (r *Router) Route() {
 	r.rg.POST("/", api.Save)
 	r.rg.GET("/:id", api.FindOne)
 	r.rg.POST("/:id", api.UpdateOne)
-	r.rg.GET("/", api.All)
+	r.rg.GET("/", api.Find)
 }

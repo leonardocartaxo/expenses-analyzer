@@ -8,7 +8,6 @@ import (
 	"github.com/teris-io/shortid"
 	"io"
 	"log/slog"
-	"net/http"
 	"os"
 )
 
@@ -22,7 +21,7 @@ func (w responseBodyWriter) Write(b []byte) (int, error) {
 	return w.ResponseWriter.Write(b)
 }
 
-// SetRequestIDMiddleware to set a unique short request ID
+// Middleware to set a unique short request ID
 func SetRequestIDMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requestID, err := shortid.Generate()
@@ -38,43 +37,40 @@ func SetRequestIDMiddleware() gin.HandlerFunc {
 // LogRequestMiddleware logs the details of the request
 func LogRequestMiddleware(logger *slog.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Extract request headers
-		headers := make(map[string][]string)
-		for k, v := range c.Request.Header {
-			headers[k] = v
-		}
+		requestID, _ := c.Get("request_id") // Retrieve the request_id from context
 
-		// Read and parse the request body (for POST and PUT requests)
-		var requestBody interface{}
-		if c.Request.Method == http.MethodPost || c.Request.Method == http.MethodPut {
+		// Check if the Content-Type is JSON
+		if c.Request.Header.Get("Content-Type") == "application/json" {
+			// Read and parse the request body as JSON
+			var requestBody interface{}
 			bodyBytes, err := io.ReadAll(c.Request.Body)
 			if err != nil {
-				logger.Error("Error reading request body", "error", err)
+				logger.Error("Error reading request body", "request_id", requestID, "error", err)
 				return
 			}
 
 			// Try to parse the body as JSON
-			if json.Unmarshal(bodyBytes, &requestBody) != nil {
-				requestBody = string(bodyBytes) // Log as string if not valid JSON
+			if json.Unmarshal(bodyBytes, &requestBody) == nil {
+				// Log the request with the parsed JSON body
+				logger.InfoContext(context.TODO(), "Request received",
+					"request_id", requestID,
+					"method", c.Request.Method,
+					"path", c.Request.URL.Path,
+					"body", requestBody,
+				)
 			}
 
 			// Reassign the body back to the request so it can be read again
 			c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 		}
-
-		// Log the request
-		logger.InfoContext(context.TODO(), "Request received",
-			"method", c.Request.Method,
-			"path", c.Request.URL.Path,
-			"headers", headers,
-			"body", requestBody,
-		)
 	}
 }
 
 // LogResponseMiddleware logs the details of the response
 func LogResponseMiddleware(logger *slog.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		requestID, _ := c.Get("request_id") // Retrieve the request_id from context
+
 		// Capture the response body
 		responseWriter := &responseBodyWriter{
 			body:           bytes.NewBufferString(""),
@@ -85,20 +81,22 @@ func LogResponseMiddleware(logger *slog.Logger) gin.HandlerFunc {
 		// Process the request
 		c.Next()
 
-		// Try to parse the response body as JSON
-		var responseBody interface{}
-		responseBytes := responseWriter.body.Bytes()
-		if json.Unmarshal(responseBytes, &responseBody) != nil {
-			responseBody = string(responseBytes) // Log as string if not valid JSON
+		// Check if the response Content-Type is JSON
+		if c.Writer.Header().Get("Content-Type") == "application/json" {
+			// Try to parse the response body as JSON
+			var responseBody interface{}
+			responseBytes := responseWriter.body.Bytes()
+			if json.Unmarshal(responseBytes, &responseBody) == nil {
+				// Log the response with the parsed JSON body
+				logger.InfoContext(context.TODO(), "Response sent",
+					"request_id", requestID,
+					"method", c.Request.Method,
+					"path", c.Request.URL.Path,
+					"status", c.Writer.Status(),
+					"response_body", responseBody,
+				)
+			}
 		}
-
-		// Log the response
-		logger.InfoContext(context.TODO(), "Response sent",
-			"method", c.Request.Method,
-			"path", c.Request.URL.Path,
-			"status", c.Writer.Status(),
-			"response_body", responseBody,
-		)
 	}
 }
 
