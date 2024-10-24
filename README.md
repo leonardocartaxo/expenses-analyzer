@@ -26,12 +26,16 @@ Enable DB_AUTO_MIGRATE and DB_DEBUG flags to see on the migration logs query and
 ```shell
 go run cmd/migrate/main.go create <migration name> sql
 ```
+### Execute on docker
+```shell
+docker-compose up
+```
 
 ## TODO
 * fix api response for duplicated items on DB
 * expand expenses module
 * unit tests
 * e2e test
-* docker, docker compose
 * authentication
 * graphql
+* implement expense parsers for collectors
