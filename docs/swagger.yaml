@@ -1,5 +1,113 @@
 basePath: /
 definitions:
+  collector.CreateDTO:
+    properties:
+      name:
+        type: string
+    type: object
+  collector.DTO:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  collector.UpdateDTO:
+    properties:
+      name:
+        type: string
+    type: object
+  expense.CreateDTO:
+    properties:
+      collectorId:
+        type: string
+      name:
+        type: string
+      placeId:
+        type: string
+      userId:
+        type: string
+      value:
+        type: number
+    type: object
+  expense.DTO:
+    properties:
+      collectorId:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      placeId:
+        type: string
+      updatedAt:
+        type: string
+      userId:
+        type: string
+      value:
+        type: number
+    type: object
+  expense.UpdateDTO:
+    properties:
+      collectorId:
+        type: string
+      name:
+        type: string
+      placeId:
+        type: string
+      userId:
+        type: string
+      value:
+        type: number
+    type: object
+  place.CreateDTO:
+    properties:
+      name:
+        type: string
+    type: object
+  place.DTO:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  place.UpdateDTO:
+    properties:
+      name:
+        type: string
+    type: object
+  tag.CreateDTO:
+    properties:
+      name:
+        type: string
+    type: object
+  tag.DTO:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  tag.UpdateDTO:
+    properties:
+      name:
+        type: string
+    type: object
   user.CreateDTO:
     properties:
       name:
@@ -38,6 +146,470 @@ info:
   title: Expenses Analyser
   version: "0.1"
 paths:
+  /collectors:
+    get:
+      consumes:
+      - application/json
+      description: Filter Collectors by query paramenters
+      parameters:
+      - description: Collector name
+        in: query
+        name: name
+        type: string
+      - description: Collector createdAt start date
+        in: query
+        name: start
+        type: string
+      - description: Collector createdAt end date
+        in: query
+        name: end
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/collector.DTO'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Filter Collectors
+      tags:
+      - collectors
+    post:
+      consumes:
+      - application/json
+      description: Save a collector by giver form
+      parameters:
+      - description: Add Collector
+        in: body
+        name: collector
+        required: true
+        schema:
+          $ref: '#/definitions/collector.CreateDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/collector.DTO'
+        "500":
+          description: Internal Server Error
+      summary: Save Collector
+      tags:
+      - collectors
+  /collectors/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Find one Collector by ID
+      parameters:
+      - description: Collector ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/collector.DTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Find one an Collector
+      tags:
+      - collectors
+    post:
+      consumes:
+      - application/json
+      description: Update one Collector by ID
+      parameters:
+      - description: Collector ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Collector
+        in: body
+        name: collector
+        required: true
+        schema:
+          $ref: '#/definitions/collector.UpdateDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/collector.DTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Update one an Collector
+      tags:
+      - collectors
+  /expenses:
+    get:
+      consumes:
+      - application/json
+      description: Filter Expenses by query paramenters
+      parameters:
+      - description: Expense name
+        in: query
+        name: name
+        type: string
+      - description: Expense createdAt start date
+        in: query
+        name: start
+        type: string
+      - description: Expense createdAt end date
+        in: query
+        name: end
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/expense.DTO'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Filter Expenses
+      tags:
+      - expenses
+    post:
+      consumes:
+      - application/json
+      description: Save a expense by giver form
+      parameters:
+      - description: Add Expense
+        in: body
+        name: expense
+        required: true
+        schema:
+          $ref: '#/definitions/expense.CreateDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/expense.DTO'
+        "500":
+          description: Internal Server Error
+      summary: Save Expense
+      tags:
+      - expenses
+  /expenses/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Find one Expense by ID
+      parameters:
+      - description: Expense ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/expense.DTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Find one an Expense
+      tags:
+      - expenses
+    post:
+      consumes:
+      - application/json
+      description: Update one Expense by ID
+      parameters:
+      - description: Expense ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Expense
+        in: body
+        name: expense
+        required: true
+        schema:
+          $ref: '#/definitions/expense.UpdateDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/expense.DTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Update one an Expense
+      tags:
+      - expenses
+  /places:
+    get:
+      consumes:
+      - application/json
+      description: Filter Places by query paramenters
+      parameters:
+      - description: Place name
+        in: query
+        name: name
+        type: string
+      - description: Place createdAt start date
+        in: query
+        name: start
+        type: string
+      - description: Place createdAt end date
+        in: query
+        name: end
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/place.DTO'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Filter Places
+      tags:
+      - places
+    post:
+      consumes:
+      - application/json
+      description: Save a place by giver form
+      parameters:
+      - description: Add Place
+        in: body
+        name: place
+        required: true
+        schema:
+          $ref: '#/definitions/place.CreateDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/place.DTO'
+        "500":
+          description: Internal Server Error
+      summary: Save Place
+      tags:
+      - places
+  /places/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Find one Place by ID
+      parameters:
+      - description: Place ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/place.DTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Find one an Place
+      tags:
+      - places
+    post:
+      consumes:
+      - application/json
+      description: Update one Place by ID
+      parameters:
+      - description: Place ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Place
+        in: body
+        name: place
+        required: true
+        schema:
+          $ref: '#/definitions/place.UpdateDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/place.DTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Update one an Place
+      tags:
+      - places
+  /tags:
+    get:
+      consumes:
+      - application/json
+      description: Filter Tags by query paramenters
+      parameters:
+      - description: Tag name
+        in: query
+        name: name
+        type: string
+      - description: Tag createdAt start date
+        in: query
+        name: start
+        type: string
+      - description: Tag createdAt end date
+        in: query
+        name: end
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/tag.DTO'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Filter Tags
+      tags:
+      - tags
+    post:
+      consumes:
+      - application/json
+      description: Save a tag by giver form
+      parameters:
+      - description: Add Tag
+        in: body
+        name: tag
+        required: true
+        schema:
+          $ref: '#/definitions/tag.CreateDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/tag.DTO'
+        "500":
+          description: Internal Server Error
+      summary: Save Tag
+      tags:
+      - tags
+  /tags/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Find one Tag by ID
+      parameters:
+      - description: Tag ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/tag.DTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Find one an Tag
+      tags:
+      - tags
+    post:
+      consumes:
+      - application/json
+      description: Update one Tag by ID
+      parameters:
+      - description: Tag ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Tag
+        in: body
+        name: tag
+        required: true
+        schema:
+          $ref: '#/definitions/tag.UpdateDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/tag.DTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Update one an Tag
+      tags:
+      - tags
   /users:
     get:
       consumes:

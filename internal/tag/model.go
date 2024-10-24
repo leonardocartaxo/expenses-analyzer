@@ -1,8 +1,7 @@
-package user
+package tag
 
 import (
 	"github.com/google/uuid"
-	"github.com/leonardocartaxo/expenses-analyzer/internal/shared"
 	"gorm.io/gorm"
 	"time"
 )
@@ -12,11 +11,8 @@ type Model struct {
 	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid()"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt           `gorm:"index"`
-	Name      string                   `gorm:"uniqueIndex"`
-	Expenses  []shared.ExpenseRefModel `gorm:"foreignKey:UserID;references:ID"`
-	// uncomment this if you want the reverse relationship, but you have to change the target table to avoid cycle import
-	//Expenses  []expense.Model `gorm:"foreignKey:UserID;references:ID"`
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+	Name      string         `gorm:"uniqueIndex"`
 }
 
 type DTO struct {
@@ -47,7 +43,7 @@ type Tabler interface {
 }
 
 func (Model) TableName() string {
-	return "users"
+	return "tags"
 }
 
 func (m *Model) ToDTO() *DTO {

@@ -5,7 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/leonardocartaxo/expenses-analyzer/docs"
 	"github.com/leonardocartaxo/expenses-analyzer/internal"
+	"github.com/leonardocartaxo/expenses-analyzer/internal/collector"
 	"github.com/leonardocartaxo/expenses-analyzer/internal/expense"
+	"github.com/leonardocartaxo/expenses-analyzer/internal/place"
+	"github.com/leonardocartaxo/expenses-analyzer/internal/tag"
 	"github.com/leonardocartaxo/expenses-analyzer/internal/user"
 	"github.com/leonardocartaxo/expenses-analyzer/internal/utils/logger"
 	swaggerFiles "github.com/swaggo/files"
@@ -49,11 +52,23 @@ func main() {
 	}
 	// Auto migrate the schema
 	if c.DB.AutoMigrate {
+		err = db.AutoMigrate(&tag.Model{})
+		if err != nil {
+			panic(err)
+		}
 		err = db.AutoMigrate(&user.Model{})
 		if err != nil {
 			panic(err)
 		}
-		err = db.AutoMigrate(&expense.Expense{})
+		err = db.AutoMigrate(&collector.Model{})
+		if err != nil {
+			panic(err)
+		}
+		err = db.AutoMigrate(&place.Model{})
+		if err != nil {
+			panic(err)
+		}
+		err = db.AutoMigrate(&expense.Model{})
 		if err != nil {
 			panic(err)
 		}
@@ -71,9 +86,19 @@ func main() {
 	r.Use(logger.SetRequestIDMiddleware())
 	r.Use(logger.LogRequestMiddleware(l))
 	r.Use(logger.LogResponseMiddleware(l))
+
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	users := r.Group("/users")
 	user.NewRouter(db, users, l).Route()
+	tags := r.Group("/tags")
+	tag.NewRouter(db, tags, l).Route()
+	collectors := r.Group("/collectors")
+	collector.NewRouter(db, collectors, l).Route()
+	places := r.Group("/places")
+	place.NewRouter(db, places, l).Route()
+	expenses := r.Group("/expenses")
+	expense.NewRouter(db, expenses, l).Route()
+
 	err = r.Run(addr)
 	if err != nil {
 		panic(err)

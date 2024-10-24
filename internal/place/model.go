@@ -1,4 +1,4 @@
-package user
+package place
 
 import (
 	"github.com/google/uuid"
@@ -14,9 +14,7 @@ type Model struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt           `gorm:"index"`
 	Name      string                   `gorm:"uniqueIndex"`
-	Expenses  []shared.ExpenseRefModel `gorm:"foreignKey:UserID;references:ID"`
-	// uncomment this if you want the reverse relationship, but you have to change the target table to avoid cycle import
-	//Expenses  []expense.Model `gorm:"foreignKey:UserID;references:ID"`
+	Expenses  []shared.ExpenseRefModel `gorm:"foreignKey:PlaceID;references:ID"`
 }
 
 type DTO struct {
@@ -47,7 +45,7 @@ type Tabler interface {
 }
 
 func (Model) TableName() string {
-	return "users"
+	return "places"
 }
 
 func (m *Model) ToDTO() *DTO {
