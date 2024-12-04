@@ -110,12 +110,16 @@ definitions:
     type: object
   user.CreateDTO:
     properties:
+      email:
+        type: string
       name:
         type: string
     type: object
   user.DTO:
     properties:
       createdAt:
+        type: string
+      email:
         type: string
       id:
         type: string
@@ -126,6 +130,8 @@ definitions:
     type: object
   user.UpdateDTO:
     properties:
+      email:
+        type: string
       name:
         type: string
     type: object

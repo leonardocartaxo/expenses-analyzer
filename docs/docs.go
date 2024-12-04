@@ -1077,6 +1077,9 @@ const docTemplate = `{
         "user.CreateDTO": {
             "type": "object",
             "properties": {
+                "email": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 }
@@ -1086,6 +1089,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "createdAt": {
+                    "type": "string"
+                },
+                "email": {
                     "type": "string"
                 },
                 "id": {
@@ -1102,6 +1108,9 @@ const docTemplate = `{
         "user.UpdateDTO": {
             "type": "object",
             "properties": {
+                "email": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 }

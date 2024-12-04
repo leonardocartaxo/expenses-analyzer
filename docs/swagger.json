@@ -1071,6 +1071,9 @@
         "user.CreateDTO": {
             "type": "object",
             "properties": {
+                "email": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 }
@@ -1080,6 +1083,9 @@
             "type": "object",
             "properties": {
                 "createdAt": {
+                    "type": "string"
+                },
+                "email": {
                     "type": "string"
                 },
                 "id": {
@@ -1096,6 +1102,9 @@
         "user.UpdateDTO": {
             "type": "object",
             "properties": {
+                "email": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 }
