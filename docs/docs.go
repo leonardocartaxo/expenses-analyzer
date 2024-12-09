@@ -750,6 +750,12 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "User email",
+                        "name": "email",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "User createdAt start date",
                         "name": "start",
                         "in": "query"
@@ -758,6 +764,24 @@ const docTemplate = `{
                         "type": "string",
                         "description": "User createdAt end date",
                         "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "User populate properties",
+                        "name": "populate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "User pagination limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "User pagination limit",
+                        "name": "offset",
                         "in": "query"
                     }
                 ],

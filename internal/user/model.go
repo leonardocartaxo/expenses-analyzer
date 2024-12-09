@@ -53,8 +53,8 @@ func (Model) TableName() string {
 	return "users"
 }
 
-func (m *Model) ToDTO() *DTO {
-	return &DTO{
+func (m Model) ToDTO() DTO {
+	return DTO{
 		ID:        m.ID.String(),
 		Name:      m.Name,
 		Email:     m.Email,
@@ -63,8 +63,12 @@ func (m *Model) ToDTO() *DTO {
 	}
 }
 
-func (m *Models) ToDTO() []*DTO {
-	dtos := []*DTO{}
+func (m *DTO) ToModel() Model {
+	return Model{Name: m.Name, Email: m.Email, CreatedAt: m.CreatedAt, UpdatedAt: m.UpdatedAt}
+}
+
+func (m *Models) ToDTO() []DTO {
+	dtos := []DTO{}
 	for _, model := range *m {
 		dtos = append(dtos, model.ToDTO())
 	}

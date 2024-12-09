@@ -8,7 +8,7 @@ go run cmd/api/main.go
 ```
 
 ## Docs
-http://localhost:8080/swagger
+http://localhost:8080/swagger/index.html
 ### Update API docs
 ```shell
 ./scripts/gen_doc.sh

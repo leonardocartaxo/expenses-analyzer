@@ -626,6 +626,10 @@ paths:
         in: query
         name: name
         type: string
+      - description: User email
+        in: query
+        name: email
+        type: string
       - description: User createdAt start date
         in: query
         name: start
@@ -634,6 +638,18 @@ paths:
         in: query
         name: end
         type: string
+      - description: User populate properties
+        in: query
+        name: populate
+        type: string
+      - description: User pagination limit
+        in: query
+        name: limit
+        type: integer
+      - description: User pagination limit
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
