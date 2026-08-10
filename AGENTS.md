@@ -7,7 +7,7 @@ Governing principles: [`.specify/memory/constitution.md`](.specify/memory/consti
 - Full rewrite (greenfield). Do not revive the deleted Go tree unless a current spec says so.
 - Monorepo: **backend** + **frontend** (+ optional shared contracts). Stack is chosen once and recorded in plan / stack notes—do not invent a stack in code before that decision.
 - Spec-driven workflow via Spec Kit skills under `.cursor/skills/` (`speckit-*`).
-- Dev environment: open the repo in the **Dev Container** (`.devcontainer/`). Works with **WebStorm** (`customizations.jetbrains`) and **VS Code / Cursor** (`customizations.vscode`). Runtime Compose (DB/app services) comes after the stack is locked.
+- Dev environment: open the repo in the **Dev Container** (`.devcontainer/`). Works with **WebStorm** (`customizations.jetbrains`) and **VS Code / Cursor** (`customizations.vscode`). Base image is **Node 24 bookworm-slim** (glibc) because JetBrains Remote Dev does not run on Alpine/musl. Runtime Compose (DB/app services) comes after the stack is locked.
 
 ## Default loop
 

@@ -1,13 +1,22 @@
-FROM node:24-alpine
+FROM node:24-bookworm-slim
 
-# Lean Alpine toolchain for Spec Kit + monorepo work (no app stack yet).
-RUN apk add --no-cache \
+# Slim glibc image: Alpine/musl breaks JetBrains WebStorm Remote Dev (host-status).
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
     bash \
     ca-certificates \
     curl \
+    fontconfig \
     git \
-    github-cli \
+    gh \
+    libfreetype6 \
+    libxi6 \
+    libxext6 \
+    libxrender1 \
+    libxtst6 \
+    procps \
     sudo \
     zsh \
+  && rm -rf /var/lib/apt/lists/* \
   && echo "node ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/node \
   && chmod 0440 /etc/sudoers.d/node

@@ -1,8 +1,12 @@
 {
-  "name": "expenses-analyzer",
+  "name": "Expenses Analyzer Dev",
   "build": {
     "dockerfile": "Dockerfile"
   },
+  "runArgs": [
+    "--name",
+    "expenses-analyzer-dev"
+  ],
   "remoteUser": "node",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
