@@ -1,0 +1,30 @@
+{
+  "name": "expenses-analyzer",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "remoteUser": "node",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "EditorConfig.EditorConfig",
+        "streetsidesoftware.code-spell-checker"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "files.trimTrailingWhitespace": true
+      }
+    },
+    "jetbrains": {
+      "backend": "WebStorm",
+      "plugins": [
+        "org.editorconfig.editorconfigjetbrains"
+      ],
+      "settings": {
+        "editor.trim.trailing.whitespace.on.save": true
+      }
+    }
+  }
+}
