@@ -14,6 +14,7 @@ RUN apt-get update \
     libxext6 \
     libxrender1 \
     libxtst6 \
+    openssh-client \
     procps \
     sudo \
     zsh \
