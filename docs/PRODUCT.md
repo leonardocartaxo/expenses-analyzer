@@ -147,18 +147,19 @@ Sign in
 - **BR-027**: For a selected month, the dashboard MUST show overall costs so members can analyze what was spent.  
 - **BR-028**: Members MUST be able to see costs **categorized by establishment tags** (e.g. food, transport, leisure, utilities) for a selected month, so they can see what kinds of expenses they have and whether a category is high.  
 - **BR-029**: Members MUST be able to assign and change **establishment tags** (subject to role) so dashboard categorization stays accurate.  
-- **BR-030**: Dashboard figures MUST respect organization isolation (only the current org’s data).
+- **BR-030**: Dashboard figures MUST respect organization isolation (only the current org’s data).  
+- **BR-031**: Each organization MUST use a **single primary currency** for bill and dashboard amounts in v1.
 
 ### Transactions and establishments
 
-- **BR-031**: An **establishment** MUST have a name; it MUST support an **address** that members can search; it MUST support **category tags** (v1 examples: food, transport, leisure, utilities; more tags may be added later).  
-- **BR-032**: Establishments MAY be reused across many bills and transactions; an establishment is not itself a bill.  
-- **BR-033**: Bills of types that carry line detail (at least **credit card** in v1) MUST support **transactions**: discrete charges **on that parent bill**.  
-- **BR-034**: Each transaction MUST be linkable to an **establishment** (e.g. Luigi Restaurant, Max Cinemas).  
-- **BR-035**: Transactions MUST NOT appear as a detached top-level bill list; they belong to their parent bill.  
-- **BR-036**: Authorized members MUST be able to add, edit, and remove transactions on a parent bill, and create/update establishment details, subject to the same bill permissions as editing that bill.  
-- **BR-037**: When transactions exist, the parent bill’s meaningful total MUST stay consistent with its transactions (sum of transaction amounts matches the bill total, or the product clearly shows how parent total and transactions relate—no silent mismatch).  
-- **BR-038**: Bill types that do not need line detail (e.g. many utility bills) MAY have zero transactions, but MUST still have a bill-level establishment; credit card bills in v1 MUST allow multiple transactions with establishments.
+- **BR-032**: An **establishment** MUST have a name; it MUST support an **address** that members can search; it MUST support **category tags** (v1 examples: food, transport, leisure, utilities; more tags may be added later).  
+- **BR-033**: Establishments MAY be reused across many bills and transactions; an establishment is not itself a bill.  
+- **BR-034**: Bills of types that carry line detail (at least **credit card** in v1) MUST support **transactions**: discrete charges **on that parent bill**.  
+- **BR-035**: Each transaction MUST be linkable to an **establishment** (e.g. Luigi Restaurant, Max Cinemas).  
+- **BR-036**: Transactions MUST NOT appear as a detached top-level bill list; they belong to their parent bill.  
+- **BR-037**: Authorized members MUST be able to add, edit, and remove transactions on a parent bill, and create/update establishment details, subject to the same bill permissions as editing that bill.  
+- **BR-038**: When transactions exist, the parent bill’s meaningful total MUST stay consistent with its transactions (sum of transaction amounts matches the bill total, or the product clearly shows how parent total and transactions relate—no silent mismatch).  
+- **BR-039**: Bill types that do not need line detail (e.g. many utility bills) MAY have zero transactions, but MUST still have a bill-level establishment; credit card bills in v1 MUST allow multiple transactions with establishments.
 
 ---
 
@@ -181,7 +182,7 @@ Illustrative flows for shared understanding. Detailed user stories belong in lat
 ## Success criteria (product-level)
 
 - **SC-001**: Stakeholders can explain that bills live only on organizations (including personal-type orgs), not on user accounts.  
-- **SC-002**: Acceptance tests for later features can map cleanly to BR-001–BR-038 (no contradictory tenancy, role, bill, import-preview, dashboard, transaction, or establishment rules).  
+- **SC-002**: Acceptance tests for later features can map cleanly to BR-001–BR-039 (no contradictory tenancy, role, bill, import-preview, dashboard, transaction, or establishment rules).  
 - **SC-003**: v1 import scope is unambiguous: **CSV via templates** for **credit card and normal bills** in; PDF/Word out; no assumption of one universal CSV layout.  
 - **SC-004**: App admin vs org bill access is unambiguous: platform only, no break-glass bills in v1.  
 - **SC-005**: v1 org types **personal** and **company** are unambiguous.  
@@ -210,6 +211,7 @@ id
 name                 # required
 address              # required
 type                 # personal | company
+currency             # single primary currency for v1
 
 MEMBERSHIP
 ----------
@@ -273,16 +275,19 @@ Which concrete issuer/utility templates ship in v1 is decided in a later feature
 
 ---
 
-## Assumptions
+## Confirmed assumptions
 
-- Auth method (email/password, etc.) is chosen in a later auth spec; this doc only requires authentication.  
-- One primary currency per organization unless a later spec adds multi-currency.  
-- A personal-type org may start with a single member; multi-member personal orgs are allowed if the product invites them.  
-- Exact limits on who may create company vs personal orgs can be refined in a later feature spec.  
-- There is **no industry-standard bill CSV**; supported layouts are whatever **CSV templates** the product defines.  
-- LLM-assisted mapping is optional later; v1 parsers are expected to be **deterministic per template**, with **editable preview** and explicit **accept / reject**.  
-- Exact rules for how bill-level vs transaction-level amounts roll into a tag on the dashboard can be refined in a later analytics feature spec; the product intent is month view + tag breakdown so members can spot overspending by category.  
-- Monorepo and AWS are delivery context, not product rules (`STACK.md`).
+These are **accepted product decisions** (not open questions). Later feature specs may refine mechanics but must not contradict them.
+
+- **Auth**: Users must authenticate; the concrete method (email/password, etc.) is chosen in a later auth feature spec.  
+- **Currency**: One primary currency per organization in v1; multi-currency / FX is out of scope until a later spec.  
+- **Personal orgs**: A personal-type org may start with a single member; multi-member personal orgs are allowed.  
+- **Who may create which org type**: Exact limits (who can create company vs personal) can be refined in a later feature spec; creating a personal org for oneself is in scope.  
+- **CSV reality**: There is **no industry-standard bill CSV**; supported layouts are only what **CSV templates** define.  
+- **CSV parsing (v1)**: Deterministic parsers **per template**, plus **editable preview** and explicit **accept / reject**. LLM-assisted mapping is optional later, never a substitute for preview/validation.  
+- **PDF/Word (later)**: When added, prefer hybrid extraction with the **same preview → accept/reject** gate; not blind auto-commit.  
+- **Dashboard tag totals**: Exact attribution rules (bill-level vs transaction-level amounts into a tag) can be refined in a later analytics feature spec; product intent remains month view + tag breakdown to spot category overspending.  
+- **Delivery context**: Monorepo and AWS are not product rules (`STACK.md`).
 
 ---
 
@@ -318,6 +323,10 @@ Which concrete issuer/utility templates ship in v1 is decided in a later feature
 | Credit card | Bill establishment = card/issuer; transactions each have their own establishment |
 | Establishment | Reusable; name, address, tags; used by bills and by transactions |
 | Establishment tags (v1 examples) | food, transport, leisure, utilities |
+| Currency (v1) | One primary currency per organization; no FX/multi-currency |
+| Auth method | Deferred to a later auth feature spec; authentication required |
+| Personal org membership | May start with one member; multi-member allowed |
+| PDF/Word parsing | Later; same preview → accept/reject gate when added |
 | PDF/Word | Later |
 | Bill type examples | Credit card (with transactions), water, power, etc. |
 | User stories in this doc | Deferred — definition only; stories in later feature specs |
