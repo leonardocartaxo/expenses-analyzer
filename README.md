@@ -230,12 +230,23 @@ create-expense spec. Run pnpm verify when done.
 ## Local development
 
 1. Open the repo in the **Dev Container** ([`.devcontainer/`](.devcontainer/)) — Cursor, VS Code, or WebStorm Remote Dev.  
-2. After bootstrap is implemented:
+2. **Cursor CLI (`agent`) login** (required inside the Dev Container if you use the Cursor agent CLI):
+   - Post-create installs the Cursor CLI (`agent`) into `~/.local/bin`.
+   - Open a **new terminal** in the container (so `PATH` picks up `~/.local/bin`), then run:
+
+```bash
+agent login
+```
+
+   - Complete the browser/device login flow when prompted. Without this, `agent` commands from the Dev Container will not be authenticated.
+   - Check: `agent --version` (and that `agent` is on your `PATH`).
+
+3. After bootstrap is implemented:
    - Compose → Postgres 18  
    - kind + Kustomize → Nest API  
    - Next.js locally (Amplify for hosted UI)  
-3. Never commit secrets or `.env` files with credentials.  
-4. Definition of done: **`pnpm verify`** (and CI on the PR).
+4. Never commit secrets or `.env` files with credentials.  
+5. Definition of done: **`pnpm verify`** (and CI on the PR).
 
 Until bootstrap lands, there is no `pnpm verify` or `apps/` tree yet—use Spec Kit example A above to create them.
 

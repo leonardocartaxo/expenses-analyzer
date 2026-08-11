@@ -9,6 +9,7 @@ Global product / business rules: [`docs/PRODUCT.md`](docs/PRODUCT.md) — do not
 - Monorepo: **backend** + **frontend** (+ optional shared contracts). Stack is chosen once and recorded in plan / stack notes—do not invent a stack in code before that decision.
 - Spec-driven workflow via Spec Kit skills under `.cursor/skills/` (`speckit-*`). Feature specs under `specs/` must align with `docs/PRODUCT.md`.
 - Dev environment: open the repo in the **Dev Container** (`.devcontainer/`). Works with **WebStorm** (`customizations.jetbrains`) and **VS Code / Cursor** (`customizations.vscode`). Base image is **Node 24 bookworm-slim** (glibc) because JetBrains Remote Dev does not run on Alpine/musl. Runtime Compose (DB/app services) comes after the stack is locked.
+- **Cursor CLI**: post-create installs `agent`. In a new Dev Container shell, run **`agent login`** so the CLI is authenticated (see `README.md` → Local development).
 
 ## Default loop
 
