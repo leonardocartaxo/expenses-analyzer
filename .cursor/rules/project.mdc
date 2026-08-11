@@ -1,0 +1,12 @@
+---
+description: Always apply Expenses Analyzer governance and monorepo SDD rules
+alwaysApply: true
+---
+
+# Expenses Analyzer
+
+- Follow `.specify/memory/constitution.md` and `AGENTS.md`.
+- Full rewrite; monorepo with backend + frontend; stack not locked until bootstrap 2 / first plan.
+- Use Spec Kit skills (`speckit-*`) for feature work. Do not invent product behavior outside an approved spec.
+- Definition of done is the project verify harness once it exists.
+- Never commit secrets or `.env` files with credentials.

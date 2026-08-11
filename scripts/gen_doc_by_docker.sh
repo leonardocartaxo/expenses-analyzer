@@ -1,1 +1,0 @@
-docker run --rm -v $(pwd):/code ghcr.io/swaggo/swag:latest init
