@@ -4,7 +4,7 @@
 
 **Created**: 2026-08-10
 
-**Status**: Pointer — canonical product rules live elsewhere
+**Status**: Pointer — canonical product rules live in `docs/PRODUCT.md` (**Approved**)
 
 ## Canonical document
 

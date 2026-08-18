@@ -1,6 +1,6 @@
 # CSV template: `expenses-card-statement-v1`
 
-**Status**: Draft (product template — not an issuer-specific bank export)  
+**Status**: Approved (product template — not an issuer-specific bank export)  
 **Source kind**: `credit_card`  
 **Display name**: Expenses Analyzer card statement (v1)
 

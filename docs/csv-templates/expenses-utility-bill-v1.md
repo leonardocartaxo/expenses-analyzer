@@ -1,6 +1,6 @@
 # CSV template: `expenses-utility-bill-v1`
 
-**Status**: Draft  
+**Status**: Approved  
 **Source kind**: normal bills (`water` | `power` | `gas` | `internet` | `phone`)  
 **Display name**: Expenses Analyzer utility bill (v1)
 

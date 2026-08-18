@@ -1,7 +1,8 @@
 # Expenses Analyzer — Product
 
-**Status**: Draft  
-**Updated**: 2026-08-18
+**Status**: Approved  
+**Updated**: 2026-08-18  
+**Approved**: 2026-08-18
 
 This is the **only** source of truth for global product intent: what the app is, who it is for, how it works, and normative business rules. Feature specs under `specs/` must not contradict this document; they add delivery detail for one slice at a time.
 

@@ -13,6 +13,6 @@
 
 ## Notes
 
-- Refine product intent by editing `docs/PRODUCT.md` only.
-- Draft delivery slices: [`specs/README.md`](../../README.md). Keep PRODUCT.md **Draft** until you approve it.
-- Next implementable slice after approval: `002-bootstrap`.
+- Refine product intent by editing `docs/PRODUCT.md` only (now **Approved**).
+- Draft delivery slices: [`specs/README.md`](../../README.md).
+- Next implementable slice after that spec is approved: `002-bootstrap`.
