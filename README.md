@@ -1,12 +1,38 @@
 # Expenses Analyzer
 
-Personal and organization **bills / expenses** analysis: all bills live on **organizations** (including type **personal** or **company**). See [`docs/PRODUCT.md`](docs/PRODUCT.md).
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/status-rewrite-blue)](#status)
+[![Spec Kit](https://img.shields.io/badge/process-spec--driven-informational)](#spec-driven-development-how-we-build)
 
-**Global product rules (what / who / how):** [`docs/PRODUCT.md`](docs/PRODUCT.md) — edit that file when product intent changes.  
-Feature specs under [`specs/`](specs/) deliver slices that must align with PRODUCT.md.  
-This README is the human entrypoint for the reboot.
+Capture, categorize, and understand **bills and spending** inside **organizations** (personal or company). All bills live on an organization—not on a user account.
 
-This repo is a **full rewrite** (greenfield monorepo). Do not revive the old Go tree unless a current spec says so.
+| | |
+| --- | --- |
+| **Name** | Expenses Analyzer |
+| **Repository** | https://github.com/leonardocartaxo/expenses-analyzer |
+| **Product** | [`docs/PRODUCT.md`](docs/PRODUCT.md) (**Approved**) |
+| **Stack** | [`STACK.md`](STACK.md) |
+| **License** | [MIT](LICENSE) |
+| **Maintainer** | [Leonardo Cartaxo](https://github.com/leonardocartaxo) |
+
+This README is the human entrypoint for the reboot. Global product rules: [`docs/PRODUCT.md`](docs/PRODUCT.md). Feature specs under [`specs/`](specs/) deliver slices that must align with PRODUCT.md. Edit PRODUCT.md when product intent changes.
+
+## Status
+
+This repo is a **full rewrite** (greenfield monorepo). Application packages (`apps/`, `pnpm verify`) are **not scaffolded yet**. Do not revive the old Go tree unless a current spec says so.
+
+## Table of contents
+
+- [What’s locked (stack)](#whats-locked-stack)
+- [Spec-driven development (how we build)](#spec-driven-development-how-we-build)
+- [Local development](#local-development)
+- [Repo map (target)](#repo-map-target)
+- [Commits and releases](#commits-and-releases)
+- [Where to go next](#where-to-go-next)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
 
 ## What’s locked (stack)
 
@@ -22,8 +48,6 @@ See [`STACK.md`](STACK.md) for the full decision table. Short version:
 | Local | Dev Container + Compose (Postgres) + kind (Nest) + Kustomize |
 | Cloud | AWS: EKS Fargate + KEDA scale-to-zero, ALB, ECR, RDS (Aurora-compatible), CDK, GitHub Actions |
 | Done when | `pnpm verify` (lint → typecheck → Jest) passes |
-
-Application packages are not scaffolded yet; stack and Spec Kit governance are in place.
 
 ## Spec-driven development (how we build)
 
@@ -299,3 +323,16 @@ AGENTS.md             Agent / SDD entrypoint
 1. [`docs/PRODUCT.md`](docs/PRODUCT.md) is **Approved**. Delivery slices: [`specs/README.md`](specs/README.md).  
 2. Approve and `/speckit-plan` **bootstrap** (`002-bootstrap`) next.  
 3. Implement only from approved feature specs.
+
+## Contributing
+
+1. Open the repo in the **Dev Container**.  
+2. Follow [Spec-driven development](#spec-driven-development-how-we-build): PRODUCT.md → slice spec → plan → **test-first** → `pnpm verify`.  
+3. Prefer [Conventional Commits](https://www.conventionalcommits.org/).  
+4. Do not commit secrets or `.env` files with credentials.
+
+Issues and pull requests: https://github.com/leonardocartaxo/expenses-analyzer
+
+## License
+
+[MIT](LICENSE) © 2026 Leonardo Cartaxo
