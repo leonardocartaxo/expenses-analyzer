@@ -45,8 +45,8 @@ See [`STACK.md`](STACK.md) for the full decision table. Short version:
 | Frontend | Next.js (React 19) on AWS Amplify |
 | API contract | OpenAPI from Nest → Orval client (`packages/api-client`) |
 | Monorepo | pnpm workspaces: `apps/backend`, `apps/frontend`, `packages/api-client` |
-| Local | Dev Container + Compose (Postgres) + kind (Nest) + Kustomize |
-| Cloud | AWS: EKS Fargate + KEDA scale-to-zero, ALB, ECR, RDS (Aurora-compatible), CDK, GitHub Actions |
+| Local | **Host** (Nest+Next) + Compose Postgres only → **Dev Container** → **kind** (`pnpm local:up`) |
+| Cloud | AWS: EKS Fargate + KEDA scale-to-zero, ALB, ECR, RDS (Aurora-compatible), CDK, GitHub Actions; **POC wake/sleep** (`pnpm wake` waits until ready) |
 | Done when | `pnpm verify` (lint → typecheck → Jest) passes |
 
 ## Spec-driven development (how we build)
@@ -115,10 +115,12 @@ Bootstrap the expenses-analyzer monorepo per STACK.md:
 - pnpm workspaces with apps/backend (NestJS), apps/frontend (Next.js),
   packages/api-client (Orval)
 - root pnpm verify = ESLint + Prettier + tsc + Jest
-- Docker Compose for Postgres 18
-- kind + Kustomize stubs for the Nest backend
+- Docker Compose: **PostgreSQL 18 only** (no Nest/Next Compose services)
+- **Default:** Nest + Next on the **host** (no Dev Container required)
+- Optional Dev Container: Nest + Next inside; same Compose Postgres
+- Optional kind + Kustomize: same pieces as **pods** (`pnpm local:up`)
 - no real expenses domain yet — health/scaffold only
-- defer full CDK/EKS/Amplify deploy to a later feature
+- defer full CDK/EKS/Amplify deploy to `011-aws-deploy`
 ```
 
 Then open `specs/00x-…/spec.md`, read acceptance criteria, and **approve** (or ask for edits).
@@ -135,7 +137,7 @@ Then open `specs/00x-…/spec.md`, read acceptance criteria, and **approve** (or
 /speckit-plan
 
 Plan the approved bootstrap spec using STACK.md.
-Defer full AWS deploy; stub local Compose/kind/Kustomize only.
+Defer AWS first deploy to `011-aws-deploy`. Local in order: host + Compose Postgres, Dev Container, kind (`pnpm local:up`).
 ```
 
 **Approve** `plan.md`.
@@ -277,24 +279,22 @@ fix the form so that test passes. Run pnpm verify when done.
 
 ## Local development
 
-1. Open the repo in the **Dev Container** ([`.devcontainer/`](.devcontainer/)) — Cursor, VS Code, or WebStorm Remote Dev.  
-2. **Cursor CLI (`agent`) login** (required inside the Dev Container if you use the Cursor agent CLI):
-   - Post-create installs the Cursor CLI (`agent`) into `~/.local/bin`.
-   - Open a **new terminal** in the container (so `PATH` picks up `~/.local/bin`), then run:
+**Preferred order** after bootstrap: **host** → **Dev Container** → **kind**.
+
+1. **Host (default):** Node + pnpm on your machine. **Docker Compose runs PostgreSQL 18 only.** Start Nest and Next locally; they talk to that Postgres. No Dev Container required.
+2. **Dev Container (optional):** [`.devcontainer/`](.devcontainer/) — Cursor, VS Code, or WebStorm Remote Dev. Nest and Next **inside** the container; **same Compose Postgres-only**.
+   - **Cursor CLI (`agent`) login** if you use the Cursor agent CLI in the container:
+     - Post-create installs `agent` into `~/.local/bin`.
+     - New terminal, then:
 
 ```bash
 agent login
 ```
 
-   - Complete the browser/device login flow when prompted. Without this, `agent` commands from the Dev Container will not be authenticated.
-   - Check: `agent --version` (and that `agent` is on your `PATH`).
-
-3. After bootstrap is implemented:
-   - Compose → Postgres 18  
-   - kind + Kustomize → Nest API  
-   - Next.js locally (Amplify for hosted UI)  
-4. Never commit secrets or `.env` files with credentials.  
-5. Definition of done: **`pnpm verify`** (and CI on the PR).
+     - Check: `agent --version`.
+3. **kind (optional):** **`pnpm local:up`** → Postgres, Nest, and Next as **pods**; wait until ready; `local:down` / `local:status`.
+4. Hosted first deploy is later (`011`). POC wake/sleep is after that (`010`). Never commit secrets or `.env` files with credentials.  
+5. Definition of done: **`pnpm verify`** (and CI on the PR). `pnpm verify` does not require Compose or kind to be running.
 
 Until bootstrap lands, there is no `pnpm verify` or `apps/` tree yet—use Spec Kit example A above to create them.
 
@@ -321,12 +321,12 @@ AGENTS.md             Agent / SDD entrypoint
 ## Where to go next
 
 1. [`docs/PRODUCT.md`](docs/PRODUCT.md) is **Approved**. Delivery slices: [`specs/README.md`](specs/README.md).  
-2. Approve and `/speckit-plan` **bootstrap** (`002-bootstrap`) next.  
+2. **`002-bootstrap` is Approved.** Next: `/speckit-plan` for bootstrap.  
 3. Implement only from approved feature specs.
 
 ## Contributing
 
-1. Open the repo in the **Dev Container**.  
+1. Run locally on the **host** (Compose Postgres only) or use the **Dev Container**.  
 2. Follow [Spec-driven development](#spec-driven-development-how-we-build): PRODUCT.md → slice spec → plan → **test-first** → `pnpm verify`.  
 3. Prefer [Conventional Commits](https://www.conventionalcommits.org/).  
 4. Do not commit secrets or `.env` files with credentials.

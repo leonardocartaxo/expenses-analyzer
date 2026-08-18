@@ -113,5 +113,5 @@ PDF/Word and unreadable or wrong-template CSVs fail with a plain-language messag
 
 ## Assumptions
 
-- Draft preview storage (memory vs temporary table) is a plan choice; product rule is no lasting domain commit until accept.
+- Where the uploaded file and preview live (memory, temporary table, or object storage such as S3) is **deferred** until this slice is planned. Product rule stays: no lasting domain commit until accept.
 - LLM mapping is out of scope.

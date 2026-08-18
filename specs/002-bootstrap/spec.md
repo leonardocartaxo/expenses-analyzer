@@ -4,9 +4,11 @@
 
 **Created**: 2026-08-18
 
-**Status**: Draft
+**Status**: Approved
 
-**Input**: Scaffold the expenses-analyzer monorepo per STACK.md with health/scaffold only; no expenses domain; defer full AWS deploy.
+**Approved**: 2026-08-18
+
+**Input**: Scaffold the expenses-analyzer monorepo per STACK.md with health/scaffold only. Local in this order: (1) Nest+Next on the host + Compose Postgres only, (2) Dev Container + Compose Postgres, (3) kind (`pnpm local:up`) as pods. No expenses domain; defer AWS to `011-aws-deploy`.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -41,18 +43,52 @@ The monorepo contains a backend app, a frontend app, and a shared API-client pac
 
 ---
 
-### User Story 3 - Local Postgres and Kubernetes packaging stubs (Priority: P2)
+### User Story 3 - Host machine + Compose Postgres (Priority: P1)
 
-Local development can start stock PostgreSQL 18 via Compose. Kubernetes packaging for the backend exists as Kustomize stubs suitable for kind. Full AWS (CDK, EKS, Amplify, RDS wake) is out of this slice.
+**First / default local option.** A developer does **not** use the Dev Container. They run **Nest and Next on their machine** (host Node + pnpm). **Docker Compose runs PostgreSQL 18 only** — no Nest/Next Compose services. Apps connect to that Postgres on localhost. Full AWS is out of this slice.
 
-**Why this priority**: Local runtime should match STACK.md without locking AWS deploy details.
+**Why this priority**: Lowest-friction inner loop for people who already have Node on the laptop.
 
-**Independent Test**: Compose starts Postgres 18; Kustomize base/overlay files exist and apply conceptually to kind (cluster create may be documented rather than required in verify).
+**Independent Test**: Compose Postgres up; Nest and Next start on the host; health works against that Postgres.
 
 **Acceptance Scenarios**:
 
-1. **Given** Docker is available, **When** the developer starts Compose for Postgres 18, **Then** a stock PostgreSQL 18 instance is reachable with credentials from a gitignored local env example (no real secrets in git).
-2. **Given** the repo, **When** a reviewer inspects Kustomize packaging, **Then** there is a backend base plus at least a kind overlay stub.
+1. **Given** Docker and Node/pnpm on the host, **When** the developer starts Compose, **Then** only PostgreSQL 18 runs as a container (Nest and Next are not Compose services).
+2. **Given** that Postgres, **When** they start Nest and Next **on the host**, **Then** the scaffold frontend uses the generated client against Nest health.
+3. **Given** committed env examples, **When** they point the host apps at Compose Postgres, **Then** no real secrets are required in git.
+
+---
+
+### User Story 4 - Dev Container + Compose Postgres (Priority: P1)
+
+**Second local option.** A developer works **inside the Dev Container**. They start **Nest and Next in that container**. **PostgreSQL 18** uses the **same Compose-Postgres-only** idea (its own container), not the Dev Container as the DB server.
+
+**Why this priority**: Same inner loop for IDEs that prefer the Dev Container (WebStorm Remote Dev, Cursor/VS Code).
+
+**Independent Test**: Dev Container + Compose Postgres; Nest and Next start in the container; health works.
+
+**Acceptance Scenarios**:
+
+1. **Given** the Dev Container and Compose, **When** the developer starts Postgres via Compose, **Then** PostgreSQL 18 is in its **own** container.
+2. **Given** that Postgres, **When** they start Nest and Next **inside the Dev Container**, **Then** the scaffold frontend uses the generated client against Nest health.
+
+---
+
+### User Story 5 - Local kind deploy (Priority: P1)
+
+**Third local option.** A developer can run **`pnpm local:up`**. That starts **kind**, applies Kustomize, and runs **PostgreSQL 18, Nest, and Next as pods**. The command **waits until health is ready** and prints URLs. `local:down` / `local:status` exist. Optional; not required for daily host or Dev Container work.
+
+**Why this priority**: Practice the k8s packaging locally before EKS.
+
+**Independent Test**: local-up; Postgres, Nest, and frontend pods Ready; health works; local-down removes the kind stack.
+
+**Acceptance Scenarios**:
+
+1. **Given** Docker is available, **When** the developer runs **`pnpm local:up`**, **Then** kind runs Postgres 18 + Nest + frontend as pods, and the command succeeds only after Nest health is ready (then it prints URLs).
+2. **Given** that stack is up, **When** they list pods, **Then** they see Postgres, Nest, and the frontend as running containers.
+3. **Given** the stack is up, **When** they run **`pnpm local:status`**, **Then** they see ready vs not-ready without starting AWS.
+4. **Given** the stack is up, **When** they run **`pnpm local:down`**, **Then** those kind workloads are torn down (idempotent if already down).
+5. **Given** `pnpm verify`, **When** Compose and kind are not running, **Then** verify can still pass.
 
 ---
 
@@ -61,6 +97,7 @@ Local development can start stock PostgreSQL 18 via Compose. Kubernetes packagin
 - Verify must fail if a workspace package is missing `lint`, `typecheck`, or `test`.
 - Committed env examples MUST NOT contain real credentials.
 - Health route MUST NOT return organization, bill, or user domain data.
+- Host, Dev Container, and kind MUST NOT be required to run at the same time (port clashes are OK to avoid; document if they conflict).
 - Stack choices in [`STACK.md`](../../STACK.md) MUST be followed; do not introduce a second package manager, ORM, or frontend framework.
 
 ## Requirements *(mandatory)*
@@ -73,10 +110,14 @@ Local development can start stock PostgreSQL 18 via Compose. Kubernetes packagin
 - **FR-004**: Backend MUST be NestJS 11 with a health/scaffold HTTP route only (no expenses domain entities).
 - **FR-005**: Frontend MUST be Next.js (App Router) on React 19 with a scaffold page only.
 - **FR-006**: Backend MUST publish OpenAPI for the health route; Orval MUST generate the client into `packages/api-client`; frontend MUST consume that package.
-- **FR-007**: Docker Compose MUST define stock PostgreSQL 18. TypeORM MAY connect for a smoke/health check; MUST NOT `synchronize` as the documented non-local default.
-- **FR-008**: Kustomize stubs MUST exist for the Nest backend (base + kind overlay). Helm MUST NOT be introduced.
-- **FR-009**: This slice MUST NOT implement sign-up, organizations, bills, CSV, dashboard, or AWS deploy (CDK/EKS/Amplify/RDS wake).
-- **FR-010**: Secrets MUST NOT be committed; provide `.env` examples only.
+- **FR-007**: Docker Compose MUST run **PostgreSQL 18 only** (no Nest/Next Compose services). That Compose file is the DB for **host** and **Dev Container** inner loops. TypeORM MAY connect; MUST NOT `synchronize` as the documented non-local default.
+- **FR-008**: **Host path (default):** Nest and Next MUST run on the developer’s machine (Node + pnpm). They MUST connect to Compose Postgres. The Dev Container MUST NOT be required for this path.
+- **FR-009**: **Dev Container path:** Nest and Next MAY run inside the Dev Container against the same Compose-Postgres-only setup. Postgres MUST NOT run as the DB server inside the Dev Container PID namespace.
+- **FR-010**: The kind overlay MUST run stock **PostgreSQL 18** plus Nest and frontend as cluster workloads.
+- **FR-011**: Kustomize MUST include a Nest base plus a **kind** overlay that deploys Postgres, Nest, and the frontend. Helm MUST NOT be introduced.
+- **FR-012**: This slice MUST NOT implement sign-up, organizations, bills, CSV, dashboard, or AWS deploy (CDK/EKS/Amplify). AWS first deploy is `011-aws-deploy`; wake/sleep is `010`.
+- **FR-013**: Secrets MUST NOT be committed; provide `.env` examples only.
+- **FR-014**: Operators MUST have **`pnpm local:up`**, **`pnpm local:down`**, and **`pnpm local:status`** for the **kind** path. **local:up** MUST wait until Nest health is ready, then print URLs. Host/Dev Container Postgres start is Compose, not `local:up`.
 
 ### Key Entities
 
@@ -88,13 +129,18 @@ Local development can start stock PostgreSQL 18 via Compose. Kubernetes packagin
 ### Measurable Outcomes
 
 - **SC-001**: A new developer can install and pass `pnpm verify` without implementing any PRODUCT.md domain feature.
-- **SC-002**: Health can be called through the generated client from the frontend scaffold in one local runbook path.
-- **SC-003**: Compose Postgres 18 starts from the documented local command.
-- **SC-004**: No expenses-domain tables, routes, or screens ship in this slice.
+- **SC-002**: On the **host** (no Dev Container), health can be called through the generated client from Next against Nest, with Postgres only in Compose.
+- **SC-003**: In the **Dev Container**, the same health path works with Compose Postgres.
+- **SC-004**: `pnpm local:up` brings up **kind** with Postgres, Nest, and frontend as Ready pods and prints URLs after health succeeds.
+- **SC-005**: No expenses-domain tables, routes, or screens ship in this slice.
+- **SC-006**: `pnpm verify` passes without Compose or kind running.
 
 ## Assumptions
 
 - STACK.md core runtime is locked; this spec implements that scaffold, not a stack debate.
-- Full AWS deploy is a later slice; local Compose + Kustomize stubs are enough here.
-- kind cluster create may be documented; `pnpm verify` does not require a live cluster.
+- Full AWS deploy is `011-aws-deploy`; wake/sleep is `010`.
+- **Three** local paths, in this order: host + Compose Postgres, Dev Container + Compose Postgres, kind.
+- `pnpm verify` does not require Compose or kind.
+- The three paths need not run concurrently.
 - Package scope names default to `@expenses/*` unless a later plan changes STACK.md.
+- `packages/api-client` is a library, not a pod.
