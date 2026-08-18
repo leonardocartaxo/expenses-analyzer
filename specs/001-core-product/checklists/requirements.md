@@ -14,4 +14,5 @@
 ## Notes
 
 - Refine product intent by editing `docs/PRODUCT.md` only.
-- Next: approve PRODUCT.md, then `/speckit-specify` for delivery slices or bootstrap.
+- Draft delivery slices: [`specs/README.md`](../../README.md). Keep PRODUCT.md **Draft** until you approve it.
+- Next implementable slice after approval: `002-bootstrap`.

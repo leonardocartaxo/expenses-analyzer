@@ -1,0 +1,6 @@
+bill_date,bill_amount,bill_note,card_name,card_address,tx_date,tx_amount,tx_note,merchant_name,merchant_address,merchant_tags
+2026-01-31,200.00,January statement,Visa Rewards,1 Issuer Way,2026-01-12,45.90,Dinner,Luigi Restaurant,10 Pasta Lane,food
+2026-01-31,200.00,January statement,Visa Rewards,1 Issuer Way,2026-01-18,28.00,Matinee,Max Cinemas,5 Screen Blvd,leisure
+2026-01-31,200.00,January statement,Visa Rewards,1 Issuer Way,2026-01-22,12.50,Transit pass,City Transit,100 Depot St,transport
+2026-02-28,150.00,February statement,Visa Rewards,1 Issuer Way,2026-02-03,32.40,Lunch,Luigi Restaurant,10 Pasta Lane,food
+2026-02-28,150.00,February statement,Visa Rewards,1 Issuer Way,2026-02-14,60.00,Pharmacy,North Clinic,22 Health Rd,health

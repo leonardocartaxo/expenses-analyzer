@@ -1,0 +1,4 @@
+bill_date,amount,note,bill_type,provider_name,provider_address,provider_tags
+2026-01-15,82.40,January usage,water,City Water,50 Reservoir Rd,utilities
+2026-01-20,110.00,January usage,power,Metro Electric,8 Grid Ave,utilities
+2026-02-15,79.10,February usage,water,City Water,50 Reservoir Rd,utilities

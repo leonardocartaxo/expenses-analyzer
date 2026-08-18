@@ -17,11 +17,12 @@ Do **not** copy product rules into this file. Edit `docs/PRODUCT.md` when produc
 ## Spec Kit note
 
 - This folder exists so Spec Kit / agents can record that a product-definition pass happened (`001-core-product`).
-- Delivery work uses **new** feature specs (`002-…`, `003-…`) that **must align with** `docs/PRODUCT.md`.
-- Do **not** run `/speckit-plan` against this pointer as if it were an implementable feature backlog; plan concrete slices (auth, orgs, bills, CSV, bootstrap) instead.
+- Delivery work uses **new** feature specs listed in [`specs/README.md`](../README.md) (`002-…` onward). Those specs **must align with** `docs/PRODUCT.md`.
+- Do **not** run `/speckit-plan` against this pointer as if it were an implementable feature backlog.
 
 ## Related
 
+- Delivery slices (draft): [`specs/README.md`](../README.md)
 - Stack: [`STACK.md`](../../STACK.md)
 - Process: [`.specify/memory/constitution.md`](../../.specify/memory/constitution.md)
 - Agent guide: [`AGENTS.md`](../../AGENTS.md)

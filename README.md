@@ -273,5 +273,5 @@ AGENTS.md             Agent / SDD entrypoint
 ## Where to go next
 
 1. Refine and approve [`docs/PRODUCT.md`](docs/PRODUCT.md) (global business rules).  
-2. `/speckit-specify` for **bootstrap** or a delivery slice that follows PRODUCT.md.  
+2. Draft delivery slices (not a PRODUCT.md backlog): [`specs/README.md`](specs/README.md). Start with **bootstrap** (`002-bootstrap`) after you approve that spec.  
 3. Implement only from approved feature specs.
