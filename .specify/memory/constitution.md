@@ -1,10 +1,11 @@
 <!--
 Sync Impact Report
-- Version change: (none) → 1.0.0
-- Modified principles: N/A (initial ratification)
-- Added sections: Core Principles (I–V), Monorepo & Product Constraints, Development Workflow, Governance
+- Version change: 1.0.0 → 1.1.0
+- Modified principles: IV. Harness as Definition of Done (clarified that tests exist before
+  claiming done; test-first is now Principle VI)
+- Added sections: Core Principle VI. Test-First (NON-NEGOTIABLE)
 - Removed sections: N/A
-- Deferred: concrete language/framework versions (locked in bootstrap 2 / first `/speckit-plan`)
+- Deferred: none
 -->
 
 # Expenses Analyzer Constitution
@@ -45,6 +46,24 @@ Prefer the smallest design that satisfies the spec (YAGNI). New abstractions req
 justification in the plan. Avoid premature microservices, dual write paths, or unused
 framework layers.
 
+### VI. Test-First (NON-NEGOTIABLE)
+Specified behavior MUST be implemented test-first. For each acceptance criterion in an
+approved spec (or an existing spec that already covers a bugfix):
+
+1. Write harness-runnable tests that encode that criterion.
+2. Confirm the new tests **fail** because the behavior is missing (red).
+3. Then implement the smallest change that makes those tests pass (green).
+
+Agents MUST NOT implement the behavior first and add tests afterward. Tests MUST NOT
+invent product behavior outside `docs/PRODUCT.md` and the approved feature spec.
+
+**Harness bootstrap exception:** until the verify harness can run tests, the bootstrap
+slice MAY create the test runner first. As soon as tests can execute, remaining bootstrap
+acceptance criteria MUST be added as failing tests before the code that satisfies them.
+
+**Exempt:** documentation-only and governance-only changes (constitution, PRODUCT.md,
+specs, plans, stack notes) that do not change runtime behavior.
+
 ## Monorepo & Product Constraints
 
 - **Product**: personal/household expenses analysis—capture, categorize, and understand
@@ -67,14 +86,17 @@ framework layers.
 3. **Plan** — `/speckit-plan` with stack and monorepo package design.
 4. **Tasks** — `/speckit-tasks`; prefer `/speckit-analyze` before implement for
    multi-package features.
-5. **Implement** — `/speckit-implement` task-by-task; run harness after each coherent
-   batch; human review for contract and UX-sensitive changes.
+5. **Implement** — `/speckit-implement` task-by-task using **test-first** (Principle VI);
+   run harness after each coherent batch; human review for contract and UX-sensitive
+   changes.
 6. **Converge** — `/speckit-converge` after implement to append missed work—never
    silently rewrite specs during converge.
 
 Human approval gates: after specify and after plan for non-trivial features. Small
 bugfixes that do not change product intent may skip a new feature branch of specs only
 when an existing spec already covers the behavior; otherwise clarify or amend the spec.
+Bugfixes still MUST add or extend a failing test first when the existing harness does
+not already catch the defect.
 
 ## Governance
 
@@ -85,4 +107,4 @@ date, and note impact in the Sync Impact Report comment. PRs and agent sessions 
 respect Spec Kit artifacts and the harness. Complexity beyond the constitution requires
 explicit plan justification. Runtime agent entrypoint: `AGENTS.md` (points here).
 
-**Version**: 1.0.0 | **Ratified**: 2026-08-10 | **Last Amended**: 2026-08-10
+**Version**: 1.1.0 | **Ratified**: 2026-08-10 | **Last Amended**: 2026-08-18

@@ -14,15 +14,18 @@ Global product / business rules: [`docs/PRODUCT.md`](docs/PRODUCT.md) — do not
 ## Default loop
 
 1. `speckit-constitution` — process/governance only  
-2. Refine `docs/PRODUCT.md` when product intent changes (global rules)  
-3. `speckit-specify` → optional `speckit-clarify` — delivery slices that follow PRODUCT.md  
+2. Refine `docs/PRODUCT.md` when **global** product intent changes (then update the matching slice spec)  
+3. `speckit-specify` → optional `speckit-clarify` — delivery slices that follow PRODUCT.md (do not copy PRODUCT.md)  
 4. `speckit-plan` (stack + package layout)  
 5. `speckit-tasks` → optional `speckit-analyze`  
-6. `speckit-implement` — run the root verify harness after coherent batches  
+6. `speckit-implement` — **test-first** (constitution VI): failing tests from the approved spec, then code; run `pnpm verify` after coherent batches  
 7. `speckit-converge` — append remaining tasks; do not silently change specs  
+
+Do **not** implement from PRODUCT.md alone. PRODUCT.md is the rulebook; the feature spec is the slice; tests lock the slice; code is last.
 
 ## Hard rules
 
-- `docs/PRODUCT.md` owns global product rules; feature specs own slice behavior; plans own tech; harness owns pass/fail.
+- `docs/PRODUCT.md` owns global product rules; feature specs own slice behavior; plans own tech; tests lock the slice; harness owns pass/fail.
+- **Test-first** for specified runtime behavior: tests MUST fail before the implementation that makes them pass. Tests MUST NOT invent behavior outside PRODUCT.md and the approved spec.
 - No secrets in git. No cross-package boundary violations (UI in backend, DB in frontend).
 - Prefer the smallest change that satisfies the approved spec.

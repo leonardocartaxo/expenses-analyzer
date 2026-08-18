@@ -27,33 +27,54 @@ Application packages are not scaffolded yet; stack and Spec Kit governance are i
 
 ## Spec-driven development (how we build)
 
-**Specs own behavior. Plans own tech. Tasks own work. The harness owns pass/fail.**
+**PRODUCT.md owns global rules. Specs own a delivery slice. Plans own tech. Tests lock the slice. Code makes tests pass. The harness owns pass/fail.**
 
-Governance: [`.specify/memory/constitution.md`](.specify/memory/constitution.md) (process).  
-Product: [`docs/PRODUCT.md`](docs/PRODUCT.md).  
+Governance (including **test-first**): [`.specify/memory/constitution.md`](.specify/memory/constitution.md).  
+Product: [`docs/PRODUCT.md`](docs/PRODUCT.md) (**Approved**).  
 Agent entrypoint: [`AGENTS.md`](AGENTS.md).  
 Skills live under [`.cursor/skills/`](.cursor/skills/) (`speckit-*`).
+
+### What you edit when
+
+| If you need to… | Do this |
+| --- | --- |
+| Change a **global** product rule (who owns bills, roles, CSV gate, …) | Edit **`docs/PRODUCT.md` first**. Then amend or add a feature spec that follows it. |
+| Deliver a **slice** of behavior already in PRODUCT.md | Write/approve a spec under `specs/` (`002-…`). Do **not** copy PRODUCT.md into the spec. |
+| Choose **how** to build it | `/speckit-plan` after the spec is approved (`STACK.md`). |
+| Make it real | **Tests first** (from the spec), then code until they pass. |
+
+You do **not** add a paragraph to PRODUCT.md and then implement. PRODUCT.md is the rulebook; a slice spec is the ticket; tests prove the ticket; code is last.
+
+```text
+PRODUCT.md (global rules, already approved)
+   → feature spec (this slice) → approve
+      → plan → tasks
+         → failing tests from the spec
+            → implement until tests + pnpm verify pass
+```
 
 Use **slash commands** in Cursor chat to start each phase. Put the feature details in the same message after the command.
 
 ### Day-to-day loop (one feature)
 
 ```text
-specify → clarify? → plan → tasks → analyze? → implement → converge?
+specify → clarify? → plan → tasks → analyze? → implement (test-first) → converge?
 ```
 
 | Step | Command | Output | Your job |
 | --- | --- | --- | --- |
-| 1 | `/speckit-specify` | `specs/NNN-name/spec.md` | Describe **what/why**; approve the spec |
+| 1 | `/speckit-specify` | `specs/NNN-name/spec.md` | Slice **what/why** that follows PRODUCT.md; approve the spec |
 | 2 | `/speckit-clarify` | Updated spec | Answer up to a few focused questions |
 | 3 | `/speckit-plan` | `plan.md` (+ design notes) | Approve tech approach (uses `STACK.md`) |
 | 4 | `/speckit-tasks` | `tasks.md` | Skim the checklist |
 | 5 | `/speckit-analyze` | Consistency report | Optional before implement |
-| 6 | `/speckit-implement` | Code | Review PRs; require **`pnpm verify`** |
+| 6 | `/speckit-implement` | Tests, then code | **Test-first** (constitution VI): write failing tests from the spec, then implement; require **`pnpm verify`** |
 | 7 | `/speckit-converge` | New tasks only | Use when something from the spec is still missing |
 
 **Do not** jump to implement without an approved spec (and plan for non-trivial work).  
-**Do not** change product behavior only in code—amend the spec first.
+**Do not** implement specified behavior before the failing tests that encode it.  
+**Do not** change product behavior only in code—amend PRODUCT.md and/or the spec first.  
+**Do not** invent tests for behavior that is not in PRODUCT.md or the approved spec.
 
 ---
 
@@ -112,8 +133,9 @@ Optional:
 ```text
 /speckit-implement
 
-Execute tasks.md for bootstrap. After each coherent batch run pnpm verify
-and fix failures before continuing.
+Execute tasks.md for bootstrap. Test-first: after the Jest harness can run,
+add failing tests for health/scaffold acceptance, then implement.
+After each coherent batch run pnpm verify and fix failures before continuing.
 ```
 
 **6. Converge** (if something from the spec is still missing)
@@ -161,7 +183,8 @@ Invalid amounts show a clear error. Include acceptance criteria for the harness.
 ```text
 /speckit-implement
 
-Execute tasks for create-expense. Run pnpm verify after each coherent batch.
+Execute tasks test-first: failing tests from the spec, then code.
+Run pnpm verify after each coherent batch.
 ```
 
 ```text
@@ -200,14 +223,15 @@ Include acceptance criteria for the harness.
 
 | Situation | What to do |
 | --- | --- |
-| Bug already covered by an approved spec | Fix in code + `pnpm verify` |
-| New behavior or changed intent | `/speckit-specify` (or amend the spec), then plan/tasks/implement |
+| Bug already covered by an approved spec, **no test catches it** | Add a **failing** test from that spec, then fix until `pnpm verify` passes |
+| Bug already caught by the harness | Fix the code; keep the test |
+| New behavior or changed intent | Amend PRODUCT.md if it is a global rule; amend or add a spec; then plan/tasks; **test-first** implement |
 
 Example (covered by an existing spec):
 
 ```text
-Fix the expense form so empty amount shows the validation message from the
-create-expense spec. Run pnpm verify when done.
+Add a failing test for the empty-amount validation from the spec, then
+fix the form so that test passes. Run pnpm verify when done.
 ```
 
 ---
@@ -221,7 +245,7 @@ create-expense spec. Run pnpm verify when done.
 /speckit-plan             # after you approve the spec
 /speckit-tasks            # after you approve the plan
 /speckit-analyze          # optional
-/speckit-implement        # build + pnpm verify
+/speckit-implement        # test-first, then pnpm verify
 /speckit-converge         # append missed tasks; don’t rewrite specs
 /speckit-checklist        # optional custom checklist
 /speckit-taskstoissues    # optional: tasks → GitHub issues
