@@ -6,9 +6,16 @@
 
 **Status**: Approved
 
-**Approved**: 2026-08-18
+**Approved**: 2026-08-19
 
 **Input**: Scaffold the expenses-analyzer monorepo per STACK.md with health/scaffold only. Local in this order: (1) Nest+Next on the host + Compose Postgres only, (2) Dev Container + Compose Postgres, (3) kind (`pnpm local:up`) as pods. No expenses domain; defer AWS to `011-aws-deploy`.
+
+## Clarifications
+
+### Session 2026-08-19
+
+- Q: When PostgreSQL is not reachable, should the health route still report success? → A: No — health succeeds only if Postgres can be pinged; otherwise it fails (unhealthy)
+- Q: If health is unhealthy (for example Postgres is down), should the scaffold page still load? → A: Yes — the page loads and shows unhealthy/error from the generated client
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -37,9 +44,11 @@ The monorepo contains a backend app, a frontend app, and a shared API-client pac
 
 **Acceptance Scenarios**:
 
-1. **Given** the scaffold, **When** a caller hits the backend health route, **Then** they receive a successful health response with no organization or bill data.
-2. **Given** the scaffold, **When** a developer starts the frontend, **Then** a scaffold page loads and uses the generated API client for health (not an ad-hoc backend URL typed in the UI).
-3. **Given** the OpenAPI spec for the health route, **When** the API client is generated, **Then** the frontend imports that package and generated output is not hand-edited.
+1. **Given** the scaffold and reachable PostgreSQL, **When** a caller hits the backend health route, **Then** they receive a successful health response with no organization or bill data.
+2. **Given** the backend is running but PostgreSQL is unreachable, **When** a caller hits the health route, **Then** they receive an unsuccessful (unhealthy) response with no organization or bill data.
+3. **Given** the scaffold, **When** a developer starts the frontend, **Then** a scaffold page loads and uses the generated API client for health (not an ad-hoc backend URL typed in the UI).
+4. **Given** the frontend is running and health is unhealthy, **When** a developer opens the scaffold page, **Then** the page still loads and shows the unhealthy/error outcome from the generated client (it MUST NOT go blank or only render when health succeeds).
+5. **Given** the OpenAPI spec for the health route, **When** the API client is generated, **Then** the frontend imports that package and generated output is not hand-edited.
 
 ---
 
@@ -97,6 +106,8 @@ The monorepo contains a backend app, a frontend app, and a shared API-client pac
 - Verify must fail if a workspace package is missing `lint`, `typecheck`, or `test`.
 - Committed env examples MUST NOT contain real credentials.
 - Health route MUST NOT return organization, bill, or user domain data.
+- If PostgreSQL is unreachable, health MUST NOT report success (process-up alone is not healthy).
+- If health is unhealthy, the scaffold page MUST still load and show that outcome via the generated client (MUST NOT blank out or require successful health to render).
 - Host, Dev Container, and kind MUST NOT be required to run at the same time (port clashes are OK to avoid; document if they conflict).
 - Stack choices in [`STACK.md`](../../STACK.md) MUST be followed; do not introduce a second package manager, ORM, or frontend framework.
 
@@ -107,8 +118,8 @@ The monorepo contains a backend app, a frontend app, and a shared API-client pac
 - **FR-001**: The repository MUST be a pnpm workspace monorepo with `apps/backend`, `apps/frontend`, and `packages/api-client` as defined in STACK.md.
 - **FR-002**: Root `pnpm verify` MUST run lint → typecheck → test and fail fast.
 - **FR-003**: Lint MUST be ESLint (flat config) plus Prettier; typecheck MUST be `tsc --noEmit` per package; tests MUST be Jest.
-- **FR-004**: Backend MUST be NestJS 11 with a health/scaffold HTTP route only (no expenses domain entities).
-- **FR-005**: Frontend MUST be Next.js (App Router) on React 19 with a scaffold page only.
+- **FR-004**: Backend MUST be NestJS 11 with a health/scaffold HTTP route only (no expenses domain entities). Health MUST succeed only when PostgreSQL is reachable (ping); if Postgres is unreachable, health MUST fail (unhealthy). Health MUST NOT succeed merely because the process is up.
+- **FR-005**: Frontend MUST be Next.js (App Router) on React 19 with a scaffold page only. The page MUST load whether health succeeds or fails, MUST use the generated API client, and MUST show the unhealthy/error outcome when health is not successful.
 - **FR-006**: Backend MUST publish OpenAPI for the health route; Orval MUST generate the client into `packages/api-client`; frontend MUST consume that package.
 - **FR-007**: Docker Compose MUST run **PostgreSQL 18 only** (no Nest/Next Compose services). That Compose file is the DB for **host** and **Dev Container** inner loops. TypeORM MAY connect; MUST NOT `synchronize` as the documented non-local default.
 - **FR-008**: **Host path (default):** Nest and Next MUST run on the developer’s machine (Node + pnpm). They MUST connect to Compose Postgres. The Dev Container MUST NOT be required for this path.
@@ -122,7 +133,7 @@ The monorepo contains a backend app, a frontend app, and a shared API-client pac
 ### Key Entities
 
 - **Workspace package**: backend, frontend, or api-client member of the pnpm workspace.
-- **Health response**: non-domain liveness/readiness payload.
+- **Health response**: non-domain liveness/readiness payload. Success only when PostgreSQL answers a ping; failure when it does not.
 
 ## Success Criteria *(mandatory)*
 

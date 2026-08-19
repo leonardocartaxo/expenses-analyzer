@@ -7,7 +7,7 @@
 | Layer | Choice | Notes |
 | --- | --- | --- |
 | Runtime | **Node.js 24** | Matches Dev Container base (`node:24-bookworm-slim`) |
-| Language | **TypeScript** | Implied by NestJS + React tooling; exact TS version pinned at scaffold |
+| Language | **TypeScript 6.0.3** | Same version for Nest, Next, and `packages/api-client`. Latest line **both** NestJS 11 and Next.js support without extra flags. Do **not** use TypeScript 7 until Nest CLI supports the TS 7 compiler API. |
 | Backend | **NestJS 11** (latest `@nestjs/*`) | Pin current latest at scaffold (today: `@nestjs/core` **11.1.29**) |
 | Frontend | **React 19** (latest `react` / `react-dom`) | Pin current latest at scaffold (today: **19.2.8**) |
 | Database | **PostgreSQL 18** (wire-compatible) | App MUST run against stock **PostgreSQL 18** locally (**Compose Postgres-only** for host and Dev Container, **and** a Postgres pod on **kind**) and be deployable to **Amazon RDS for PostgreSQL** and **Amazon Aurora PostgreSQL**. Prefer portable SQL; avoid engine-specific extensions or Aurora-only APIs unless gated and documented. Pin current latest minor for local/RDS (today: **18.4**); Aurora uses the closest supported Aurora PostgreSQL-compatible version. Do not use PG 19 beta. |

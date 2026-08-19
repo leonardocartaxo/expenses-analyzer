@@ -40,7 +40,7 @@ See [`STACK.md`](STACK.md) for the full decision table. Short version:
 
 | Area | Choice |
 | --- | --- |
-| Runtime | Node.js 24, TypeScript |
+| Runtime | Node.js 24, TypeScript 6.0.3 |
 | Backend | NestJS 11 + TypeORM → PostgreSQL 18 |
 | Frontend | Next.js (React 19) on AWS Amplify |
 | API contract | OpenAPI from Nest → Orval client (`packages/api-client`) |
@@ -321,7 +321,7 @@ AGENTS.md             Agent / SDD entrypoint
 ## Where to go next
 
 1. [`docs/PRODUCT.md`](docs/PRODUCT.md) is **Approved**. Delivery slices: [`specs/README.md`](specs/README.md).  
-2. **`002-bootstrap` is Approved.** Next: `/speckit-plan` for bootstrap.  
+2. **`002-bootstrap` spec, plan, and tasks are ready.** Next: `/speckit-implement` (optional `/speckit-analyze` first).  
 3. Implement only from approved feature specs.
 
 ## Contributing
