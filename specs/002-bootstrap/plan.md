@@ -137,6 +137,7 @@ None.
 ## Phase 0 & Phase 1 notes (for implement)
 
 - Pin versions at scaffold per STACK.md; TypeScript **6.0.3** for all workspace packages. Do not change locked majors.
+- Nest listens on **3001** by default (Next on **3000**) so the two do not clash.
 - Test-first sequence: (1) workspace + Jest so tests execute, (2) failing tests for health shape, package scripts, Compose postgres-only, env examples, api-client import, local:* script presence, (3) implementation until `pnpm verify` is green.
 - Live host/Dev Container/kind flows are proven via [quickstart.md](./quickstart.md), not the harness.
 - `pnpm generate:api` must work without Postgres (see research.md).

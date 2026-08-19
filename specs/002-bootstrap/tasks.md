@@ -36,7 +36,7 @@ description: "Task list for 002-bootstrap monorepo scaffold"
 - [ ] T004 [P] Create `apps/frontend/package.json` named `@expenses/frontend` with placeholder `lint` / `typecheck` / `test` scripts and `workspace:*` dep on `@expenses/api-client`
 - [ ] T005 [P] Create `packages/api-client/package.json` named `@expenses/api-client` with placeholder `lint` / `typecheck` / `test` scripts
 - [ ] T006 Add `tsconfig.base.json` at repo root targeting TypeScript 6.0.3 (`strict` on)
-- [ ] T007 [P] Add `apps/backend/tsconfig.json`, `apps/frontend/tsconfig.json`, and `packages/api-client/tsconfig.json` extending `tsconfig.base.json`
+- [ ] T007 Add `apps/backend/tsconfig.json`, `apps/frontend/tsconfig.json`, and `packages/api-client/tsconfig.json` extending `tsconfig.base.json` (after T006)
 - [ ] T008 [P] Add root `eslint.config.mjs` (flat) and `.prettierrc`
 - [ ] T009 Run `pnpm install` so `pnpm-lock.yaml` is produced (no secrets; do not commit unless asked)
 
@@ -51,7 +51,7 @@ description: "Task list for 002-bootstrap monorepo scaffold"
 - [ ] T010 Add Jest to `@expenses/backend`, `@expenses/frontend`, and `@expenses/api-client` with `apps/backend/jest.config.ts`, `apps/frontend/jest.config.ts`, and `packages/api-client/jest.config.ts`
 - [ ] T011 Wire each package `lint` (ESLint + Prettier check), `typecheck` (`tsc --noEmit`), and `test` (Jest) in `apps/backend/package.json`, `apps/frontend/package.json`, and `packages/api-client/package.json`
 - [ ] T012 Add one trivial passing smoke test per package in `apps/backend/test/smoke.spec.ts`, `apps/frontend/test/smoke.spec.ts`, and `packages/api-client/test/smoke.spec.ts` so Jest executes (not health/domain behavior)
-- [ ] T013 Create `scripts/verify.mjs` that orchestrates lint → typecheck → test and root `package.json` scripts `lint`, `typecheck`, `test`, `verify` calling it
+- [ ] T013 Create a **stub** `scripts/verify.mjs` and root `package.json` scripts `lint`, `typecheck`, `test`, `verify`. Stub `verify` MUST NOT implement fail-fast lint → typecheck → test or the missing-script check (those are T017 after failing tests). It MAY call `test` only so the file exists for T015/T016 to fail against.
 - [ ] T014 Confirm `pnpm test` runs via root `package.json` and the three Jest configs without Compose or kind
 
 **Checkpoint**: Foundation ready — `pnpm test` executes. Remaining acceptance criteria MUST be failing tests before the code that satisfies them.
@@ -73,7 +73,7 @@ description: "Task list for 002-bootstrap monorepo scaffold"
 
 ### Implementation for User Story 1
 
-- [ ] T017 [US1] Implement required-script check and fail-fast chain in `scripts/verify.mjs` until T015 and T016 pass
+- [ ] T017 [US1] Implement required-script check and fail-fast lint → typecheck → test in `scripts/verify.mjs` until T015 and T016 pass (replace the T013 stub)
 - [ ] T018 [US1] Confirm `pnpm verify` (root `package.json` → `scripts/verify.mjs`) passes on a clean tree without Compose or kind (SC-001, SC-006)
 
 **Checkpoint**: User Story 1 is the MVP harness. Stop and validate before health/UI.
@@ -96,7 +96,7 @@ description: "Task list for 002-bootstrap monorepo scaffold"
 
 ### Implementation for User Story 2
 
-- [ ] T022 [US2] Scaffold NestJS 11 in `apps/backend/src/main.ts` and `apps/backend/src/app.module.ts` with TypeORM `synchronize: false`, zero entities, env-based Postgres config (Nest boots for tests without live DB)
+- [ ] T022 [US2] Scaffold NestJS 11 in `apps/backend/src/main.ts` and `apps/backend/src/app.module.ts` with TypeORM `synchronize: false`, zero entities, env-based Postgres config, listen on `PORT` default **3001** (Nest boots for tests without live DB)
 - [ ] T023 [US2] Implement `GET /health` in `apps/backend/src/health/` (TypeORM `SELECT 1` / ping; 200 `ok` / 503 `error` only)
 - [ ] T024 [US2] Add `@nestjs/swagger` and export script `apps/backend/src/export-openapi.ts` writing `packages/api-client/openapi.json` without a live Postgres
 - [ ] T025 [US2] Add `packages/api-client/orval.config.ts` (`client: 'fetch'`, `baseUrl.runtime` `process.env.API_BASE_URL`) and generate committed client under `packages/api-client/src/` (do not hand-edit generated files)
@@ -221,7 +221,7 @@ description: "Task list for 002-bootstrap monorepo scaffold"
 ### Parallel Opportunities
 
 - T003, T004, T005 (package.json stubs)
-- T007, T008 (tsconfigs vs eslint/prettier)
+- T006 and T008 (base tsconfig vs eslint/prettier); T007 after T006
 - T019, T020, T021 (US2 failing tests)
 - T029, T030 (US3 failing tests)
 - T039, T040 (US5 failing tests)
