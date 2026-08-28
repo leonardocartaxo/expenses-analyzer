@@ -8,7 +8,7 @@
     "expenses-analyzer-dev",
     "--add-host=host.docker.internal:host-gateway"
   ],
-  "forwardPorts": [3000, 3001, 5432],
+  "forwardPorts": [3000, 3001],
   "remoteUser": "node",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
@@ -17,6 +17,9 @@
     "source=/run/host-services/ssh-auth.sock,target=/ssh-agent,type=bind",
     "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
   ],
+  "containerEnv": {
+    "DATABASE_HOST": "host.docker.internal"
+  },
   "remoteEnv": {
     "SSH_AUTH_SOCK": "/ssh-agent",
     "DATABASE_HOST": "host.docker.internal"

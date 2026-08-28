@@ -307,7 +307,19 @@ pnpm --filter @expenses/frontend dev
 
 ### 2. Dev Container + Compose Postgres (optional)
 
-[`.devcontainer/`](.devcontainer/) — Cursor, VS Code, or WebStorm Remote Dev. Nest and Next **inside** the container; **same** root `compose.yaml` Postgres (not the Dev Container as the database). Ports **3000 / 3001 / 5432** are forwarded. Docker-outside-of-Docker (`docker.sock`) lets Compose and kind use the **host** engine. `DATABASE_HOST=host.docker.internal` (set in the container remote env). The Dev Container is **not** required for the host path.
+[`.devcontainer/`](.devcontainer/) — Cursor, VS Code, or WebStorm Remote Dev. Nest and Next **inside** the container; **same** root `compose.yaml` Postgres (not the Dev Container as the database). Forward **3000 / 3001** only (Nest/Next). Do **not** forward **5432** from the Dev Container — Compose already publishes Postgres on the host, and an IDE forward of `5432` fights that publish (JetBrains/VS Code) and yields `Connection terminated unexpectedly` from `pg`. Docker-outside-of-Docker (`docker.sock` + Docker CLI in the image) lets Compose and kind use **Docker Desktop on the host**. `DATABASE_HOST=host.docker.internal` (`containerEnv`). The Dev Container is **not** required for the host path.
+
+**First-time / after Dev Container config changes:** start **Docker Desktop** on the Mac, then **rebuild** the Dev Container (so `/var/run/docker.sock` is mounted and the image includes the Docker CLI). Then inside the container:
+
+```bash
+echo "$DATABASE_HOST"   # expect: host.docker.internal (not localhost)
+docker version
+docker compose up -d
+pnpm --filter @expenses/backend start:dev
+pnpm --filter @expenses/frontend dev
+```
+
+If Nest still fails with Postgres `Connection terminated unexpectedly`: in the IDE **Ports** UI, stop any forward of **5432**, then retry. Rebuild after this change so `forwardPorts` no longer includes `5432`.
 
 - **Cursor CLI (`agent`) login** if you use the Cursor agent CLI in the container:
   - Post-create installs `agent` into `~/.local/bin`.

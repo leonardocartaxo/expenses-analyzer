@@ -14,8 +14,13 @@ test('Dev Container is not Postgres and documents host.docker.internal plus app 
   assert.doesNotMatch(JSON.stringify(cfg.image ?? ''), /postgres/i);
   assert.doesNotMatch(raw, /"service"\s*:\s*"postgres"/);
   assert.match(raw, /host\.docker\.internal/);
+  assert.match(raw, /\/var\/run\/docker\.sock/);
+  assert.equal(cfg.containerEnv?.DATABASE_HOST, 'host.docker.internal');
   const ports = cfg.forwardPorts ?? [];
-  for (const port of [3000, 3001, 5432]) {
+  for (const port of [3000, 3001]) {
     assert.equal(ports.includes(port), true, `forwardPorts must include ${port}`);
   }
+  // Compose already publishes 5432 on the host. Forwarding 5432 from the Dev Container
+  // conflicts with that publish under JetBrains/VS Code and breaks pg ("Connection terminated unexpectedly").
+  assert.equal(ports.includes(5432), false, 'forwardPorts must not include 5432');
 });

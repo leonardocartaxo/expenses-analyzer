@@ -6,6 +6,7 @@ import {
   ApiServiceUnavailableResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 export class HealthResponseDto {
@@ -16,7 +17,8 @@ export class HealthResponseDto {
 @ApiTags('health')
 @Controller()
 export class HealthController {
-  constructor(private readonly dataSource: DataSource) {}
+  // Explicit token: start:dev uses tsx/esbuild, which does not emit decorator metadata.
+  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
 
   @Get('health')
   @ApiOperation({ operationId: 'getHealth' })
