@@ -1,0 +1,30 @@
+{
+  "name": "expenses-analyzer",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.15.1",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test && node --test scripts/*.test.mjs",
+    "verify": "node scripts/verify.mjs",
+    "generate:api": "pnpm --filter @expenses/backend openapi:export && pnpm --filter @expenses/api-client generate",
+    "local:up": "bash scripts/local/up.sh",
+    "local:down": "bash scripts/local/down.sh",
+    "local:status": "bash scripts/local/status.sh"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.6.2",
+    "typescript": "6.0.3",
+    "typescript-eslint": "^8.46.4"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "unrs-resolver"]
+  }
+}

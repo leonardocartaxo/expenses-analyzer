@@ -12,6 +12,7 @@
 
 # Dependencies & build (language-agnostic placeholders)
 node_modules/
+.pnpm-store/
 dist/
 build/
 coverage/
@@ -22,3 +23,8 @@ vendor/
 bin/
 tmp/
 *.log
+.next/
+out/
+*.tsbuildinfo
+.eslintcache
+.turbo/

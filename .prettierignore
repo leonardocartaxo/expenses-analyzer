@@ -1,0 +1,8 @@
+node_modules
+dist
+build
+coverage
+.next
+out
+pnpm-lock.yaml
+packages/api-client/src

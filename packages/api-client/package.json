@@ -1,0 +1,32 @@
+{
+  "name": "@expenses/api-client",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "lint": "eslint . && prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "jest --config jest.config.cjs",
+    "generate": "orval --config orval.config.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.3.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "jest": "^30.0.5",
+    "orval": "^7.13.2",
+    "prettier": "^3.6.2",
+    "ts-jest": "^29.4.1",
+    "typescript": "catalog:",
+    "typescript-eslint": "^8.46.4"
+  }
+}

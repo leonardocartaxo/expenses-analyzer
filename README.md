@@ -19,7 +19,7 @@ This README is the human entrypoint for the reboot. Global product rules: [`docs
 
 ## Status
 
-This repo is a **full rewrite** (greenfield monorepo). Application packages (`apps/`, `pnpm verify`) are **not scaffolded yet**. Do not revive the old Go tree unless a current spec says so.
+This repo is a **full rewrite** (greenfield monorepo). Application packages live under `apps/` and `packages/`. Definition of done is **`pnpm verify`**.
 
 ## Table of contents
 
@@ -279,33 +279,62 @@ fix the form so that test passes. Run pnpm verify when done.
 
 ## Local development
 
-**Preferred order** after bootstrap: **host** → **Dev Container** → **kind**.
+**Preferred order:** **host** → **Dev Container** → **kind**. Do not run these paths at the same time.
 
-1. **Host (default):** Node + pnpm on your machine. **Docker Compose runs PostgreSQL 18 only.** Start Nest and Next locally; they talk to that Postgres. No Dev Container required.
-2. **Dev Container (optional):** [`.devcontainer/`](.devcontainer/) — Cursor, VS Code, or WebStorm Remote Dev. Nest and Next **inside** the container; **same Compose Postgres-only**.
-   - **Cursor CLI (`agent`) login** if you use the Cursor agent CLI in the container:
-     - Post-create installs `agent` into `~/.local/bin`.
-     - New terminal, then:
+Definition of done: **`pnpm verify`** (lint → typecheck → test). It does **not** start Compose or kind.
+
+```bash
+pnpm install
+pnpm verify
+```
+
+### 1. Host + Compose Postgres (default)
+
+Nest and Next run on the host. Docker Compose runs **PostgreSQL 18.4 only**.
+
+```bash
+cp .env.backend.example .env.backend
+cp .env.frontend.example .env.frontend
+docker compose up -d
+pnpm --filter @expenses/backend start:dev
+pnpm --filter @expenses/frontend dev
+```
+
+- Backend: `http://localhost:3001/health` → `{"status":"ok"}`
+- Frontend: `http://localhost:3000`
+- `DATABASE_HOST=localhost` (published `5432`)
+- Dummy credentials only (`expenses` / `expenses`); never commit real `.env` files
+
+### 2. Dev Container + Compose Postgres (optional)
+
+[`.devcontainer/`](.devcontainer/) — Cursor, VS Code, or WebStorm Remote Dev. Nest and Next **inside** the container; **same** root `compose.yaml` Postgres (not the Dev Container as the database). Ports **3000 / 3001 / 5432** are forwarded. Docker-outside-of-Docker (`docker.sock`) lets Compose and kind use the **host** engine. `DATABASE_HOST=host.docker.internal` (set in the container remote env). The Dev Container is **not** required for the host path.
+
+- **Cursor CLI (`agent`) login** if you use the Cursor agent CLI in the container:
+  - Post-create installs `agent` into `~/.local/bin`.
+  - New terminal, then:
 
 ```bash
 agent login
 ```
 
-     - Check: `agent --version`.
-3. **kind (optional):** **`pnpm local:up`** → Postgres, Nest, and Next as **pods**; wait until ready; `local:down` / `local:status`.
-4. Hosted first deploy is later (`011`). POC wake/sleep is after that (`010`). Never commit secrets or `.env` files with credentials.  
-5. Definition of done: **`pnpm verify`** (and CI on the PR). `pnpm verify` does not require Compose or kind to be running.
+  - Check: `agent --version`.
 
-Until bootstrap lands, there is no `pnpm verify` or `apps/` tree yet—use Spec Kit example A above to create them.
+### 3. kind (optional)
+
+**`pnpm local:up`** → Postgres, Nest, and Next as **pods**; wait until health is 200; prints URLs on **8080** (frontend) and **8081** (backend). `pnpm local:status` / `pnpm local:down` (idempotent).
+
+Hosted first deploy is later (`011`). POC wake/sleep is after that (`010`). Never commit secrets or `.env` files with credentials.
 
 ## Repo map (target)
 
 ```text
-apps/backend          NestJS API
-apps/frontend         Next.js UI
+apps/backend          NestJS API (`GET /health`)
+apps/frontend         Next.js scaffold UI
 packages/api-client   Orval-generated OpenAPI client
+compose.yaml          PostgreSQL 18.4 only (host / Dev Container)
+deploy/kind           kind cluster config
+deploy/kustomize      Nest base + kind overlay (Postgres + Nest + Next)
 docs/PRODUCT.md       Global product / business rules (canonical)
-deploy/               Kustomize overlays (kind, dev, staging, prod) — when added
 specs/                Feature specs (Spec Kit); align with PRODUCT.md
 .specify/             Spec Kit templates, constitution, scripts
 STACK.md              Locked stack decisions
@@ -321,7 +350,7 @@ AGENTS.md             Agent / SDD entrypoint
 ## Where to go next
 
 1. [`docs/PRODUCT.md`](docs/PRODUCT.md) is **Approved**. Delivery slices: [`specs/README.md`](specs/README.md).  
-2. **`002-bootstrap` spec, plan, and tasks are ready.** Next: `/speckit-implement` (optional `/speckit-analyze` first).  
+2. **`002-bootstrap` is implemented.** Use `/speckit-converge` if something from the spec is still missing.  
 3. Implement only from approved feature specs.
 
 ## Contributing

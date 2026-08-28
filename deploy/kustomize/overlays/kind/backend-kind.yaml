@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  template:
+    spec:
+      containers:
+        - name: backend
+          image: expenses-analyzer-backend:local
+          imagePullPolicy: Never
+          env:
+            - name: PORT
+              value: '3001'
+            - name: DATABASE_HOST
+              value: postgres
+            - name: DATABASE_PORT
+              value: '5432'
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: expenses-db
+                  key: DATABASE_USER
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: expenses-db
+                  key: DATABASE_PASSWORD
+            - name: DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: expenses-db
+                  key: DATABASE_NAME
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 3001
+      targetPort: 3001
+      nodePort: 30081

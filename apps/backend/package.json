@@ -1,0 +1,38 @@
+{
+  "name": "@expenses/backend",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "lint": "eslint . && prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "jest --config jest.config.cjs",
+    "start:dev": "tsx watch src/main.ts",
+    "start": "tsx src/main.ts",
+    "openapi:export": "tsx src/export-openapi.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.29",
+    "@nestjs/core": "^11.1.29",
+    "@nestjs/platform-express": "^11.1.29",
+    "@nestjs/swagger": "^11.2.6",
+    "@nestjs/testing": "^11.1.29",
+    "@nestjs/typeorm": "^11.0.0",
+    "pg": "^8.16.3",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "typeorm": "^0.3.27"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.3.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "jest": "^30.0.5",
+    "prettier": "^3.6.2",
+    "ts-jest": "^29.4.1",
+    "tsx": "^4.20.5",
+    "typescript": "catalog:",
+    "typescript-eslint": "^8.46.4"
+  }
+}
