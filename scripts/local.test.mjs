@@ -6,9 +6,12 @@ import { join } from 'node:path';
 const root = join(import.meta.dirname, '..');
 
 test('local kind scripts and package.json local:* commands exist', () => {
-  for (const name of ['up.sh', 'down.sh', 'status.sh']) {
+  for (const name of ['up.sh', 'down.sh', 'status.sh', 'lib.sh']) {
     assert.equal(existsSync(join(root, 'scripts/local', name)), true, `scripts/local/${name} must exist`);
   }
+  const lib = readFileSync(join(root, 'scripts/local/lib.sh'), 'utf8');
+  assert.match(lib, /host\.docker\.internal/);
+  assert.match(lib, /fix_kind_kubeconfig_for_dood/);
   const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
   for (const script of ['local:up', 'local:down', 'local:status']) {
     assert.equal(typeof pkg.scripts?.[script], 'string', `${script} must be in root package.json`);

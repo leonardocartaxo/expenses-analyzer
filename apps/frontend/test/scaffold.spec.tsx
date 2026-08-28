@@ -10,6 +10,7 @@ describe('scaffold page', () => {
     expect(existsSync(pagePath)).toBe(true);
     const src = readFileSync(pagePath, 'utf8');
     expect(src).toContain('@expenses/api-client');
+    expect(src).toContain("dynamic = 'force-dynamic'");
     expect(src).not.toMatch(/fetch\s*\(\s*['"`]https?:\/\//);
   });
 

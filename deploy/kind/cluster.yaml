@@ -3,6 +3,16 @@ apiVersion: kind.x-k8s.io/v1alpha4
 name: expenses-analyzer
 nodes:
   - role: control-plane
+    # So kubectl from a Dev Container can use https://host.docker.internal:<port>
+    # (Docker-outside-of-Docker) without relying only on insecure-skip-tls-verify.
+    kubeadmConfigPatches:
+      - |
+        kind: ClusterConfiguration
+        apiServer:
+          certSANs:
+            - localhost
+            - 127.0.0.1
+            - host.docker.internal
     extraPortMappings:
       - containerPort: 30080
         hostPort: 8080

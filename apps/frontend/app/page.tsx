@@ -1,6 +1,9 @@
 import { getHealth } from '@expenses/api-client';
 import { ScaffoldView } from './scaffold-view';
 
+// Health must be checked per request (kind/host), not frozen at `next build`.
+export const dynamic = 'force-dynamic';
+
 export default async function Page() {
   let healthStatus: 'ok' | 'error' = 'error';
   try {

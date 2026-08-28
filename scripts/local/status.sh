@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+# shellcheck source=lib.sh
+source "${ROOT}/scripts/local/lib.sh"
+
 CLUSTER="${KIND_CLUSTER_NAME:-expenses-analyzer}"
-HEALTH_URL="${LOCAL_HEALTH_URL:-http://127.0.0.1:8081/health}"
+HEALTH_URL="${LOCAL_HEALTH_URL:-$(default_health_url)}"
 
 if ! command -v kind >/dev/null 2>&1 || ! command -v kubectl >/dev/null 2>&1; then
   echo "kind and kubectl are required for pnpm local:status" >&2
@@ -13,6 +17,8 @@ if ! kind get clusters 2>/dev/null | grep -qx "${CLUSTER}"; then
   echo "kind cluster ${CLUSTER}: not running"
   exit 1
 fi
+
+fix_kind_kubeconfig_for_dood "${CLUSTER}"
 
 echo "kind cluster ${CLUSTER}: running"
 kubectl get pods -o wide
