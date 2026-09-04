@@ -288,6 +288,8 @@ pnpm install
 pnpm verify
 ```
 
+Host and Dev Container share the repo (and `node_modules`). After installing inside the Linux container, run **`pnpm install` again on the Mac** (or vice versa) so native packages like esbuild match the current OS — or rely on `supportedArchitectures` in `pnpm-workspace.yaml` (darwin + linux) after a fresh install.
+
 ### 1. Host + Compose Postgres (default)
 
 Nest and Next run on the host. Docker Compose runs **PostgreSQL 18.4 only**.
@@ -332,6 +334,8 @@ agent login
   - Check: `agent --version`.
 
 ### 3. kind (optional)
+
+Works on the **Mac host** and in the **Dev Container**. `pnpm local:*` installs `kind` + `kubectl` into `~/.local/bin` when missing (darwin or linux). Requires **Docker Desktop**. Stop Compose first (`docker compose down`). Ready-check uses **in-cluster** `kubectl exec` (not host `:8081`), so IDE port forwards cannot break `local:up`. Open **8080/8081 in the Mac browser**; if the IDE auto-forwarded those ports, stop/ignore them (`onAutoForward: ignore` in `.devcontainer`).
 
 **`pnpm local:up`** → Postgres, Nest, and Next as **pods**; wait until health is 200; prints URLs on **8080** (frontend) and **8081** (backend). `pnpm local:status` / `pnpm local:down` (idempotent).
 

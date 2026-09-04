@@ -9,6 +9,10 @@
     "--add-host=host.docker.internal:host-gateway"
   ],
   "forwardPorts": [3000, 3001],
+  "portsAttributes": {
+    "8080": { "label": "kind-frontend", "onAutoForward": "ignore" },
+    "8081": { "label": "kind-backend", "onAutoForward": "ignore" }
+  },
   "remoteUser": "node",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "postCreateCommand": "bash .devcontainer/post-create.sh",

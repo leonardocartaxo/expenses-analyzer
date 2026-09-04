@@ -4,3 +4,21 @@ packages:
 
 catalog:
   typescript: "6.0.3"
+
+# Shared bind-mount: host Mac + Linux Dev Container both use the same node_modules.
+# Install native optional deps (esbuild, etc.) for both platforms.
+supportedArchitectures:
+  os:
+    - darwin
+    - linux
+    - current
+  cpu:
+    - arm64
+    - x64
+  libc:
+    - glibc
+    - current
+
+onlyBuiltDependencies:
+  - esbuild
+  - unrs-resolver

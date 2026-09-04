@@ -6,6 +6,47 @@ in_container() {
   [[ -f /.dockerenv ]] || [[ -f /run/.containerenv ]]
 }
 
+# Install kind + kubectl into ~/.local/bin when missing (Mac host or Dev Container).
+# Uses the current OS/arch so the same script works on darwin and linux.
+ensure_kind_kubectl() {
+  export PATH="${HOME}/.local/bin:${PATH}"
+  mkdir -p "${HOME}/.local/bin"
+
+  local os arch
+  case "$(uname -s)" in
+    Darwin) os=darwin ;;
+    Linux) os=linux ;;
+    *)
+      echo "unsupported OS for auto-install of kind/kubectl: $(uname -s)" >&2
+      return 1
+      ;;
+  esac
+  case "$(uname -m)" in
+    x86_64 | amd64) arch=amd64 ;;
+    aarch64 | arm64) arch=arm64 ;;
+    *) arch="$(uname -m)" ;;
+  esac
+
+  if ! command -v kubectl >/dev/null 2>&1 || ! kubectl version --client >/dev/null 2>&1; then
+    echo "Installing kubectl (${os}/${arch}) to ${HOME}/.local/bin…"
+    local kubectl_version
+    kubectl_version="$(curl -fsSL https://dl.k8s.io/release/stable.txt)"
+    curl -fsSL -o "${HOME}/.local/bin/kubectl" \
+      "https://dl.k8s.io/release/${kubectl_version}/bin/${os}/${arch}/kubectl"
+    chmod +x "${HOME}/.local/bin/kubectl"
+  fi
+
+  if ! command -v kind >/dev/null 2>&1 || ! kind version >/dev/null 2>&1; then
+    echo "Installing kind (${os}/${arch}) to ${HOME}/.local/bin…"
+    local kind_version
+    kind_version="$(curl -fsSL https://api.github.com/repos/kubernetes-sigs/kind/releases/latest | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -n 1)"
+    kind_version="${kind_version:-v0.27.0}"
+    curl -fsSL -o "${HOME}/.local/bin/kind" \
+      "https://kind.sigs.k8s.io/dl/${kind_version}/kind-${os}-${arch}"
+    chmod +x "${HOME}/.local/bin/kind"
+  fi
+}
+
 # kind writes kubeconfig with https://127.0.0.1:<port>. That works on the host;
 # from a Dev Container, 127.0.0.1 is the workspace container — use host.docker.internal.
 # API server cert may not include that name on older clusters, so skip TLS verify only in DooD.
@@ -36,11 +77,28 @@ fix_kind_kubeconfig_for_dood() {
   fi
 }
 
-# Health URL used by scripts (wait/status). Host browser URLs stay 127.0.0.1.
-default_health_url() {
-  if in_container; then
-    echo "http://host.docker.internal:8081/health"
-  else
-    echo "http://127.0.0.1:8081/health"
-  fi
+# Health check via the backend pod (avoids host:8081 conflicts with IDE port forwards
+# and Docker Desktop hairpin from the Dev Container).
+check_backend_health() {
+  kubectl exec deploy/backend -- node -e '
+fetch("http://127.0.0.1:3001/health")
+  .then(async (res) => {
+    const body = await res.json().catch(() => ({}));
+    process.exit(res.status === 200 && body.status === "ok" ? 0 : 1);
+  })
+  .catch(() => process.exit(1));
+' >/dev/null 2>&1
+}
+
+# Optional: also try published URL when LOCAL_HEALTH_URL is set (host debugging).
+check_health_url() {
+  local url="${1:?}"
+  node -e '
+fetch(process.argv[1])
+  .then(async (res) => {
+    const body = await res.json().catch(() => ({}));
+    process.exit(res.status === 200 && body.status === "ok" ? 0 : 1);
+  })
+  .catch(() => process.exit(1));
+' "${url}"
 }

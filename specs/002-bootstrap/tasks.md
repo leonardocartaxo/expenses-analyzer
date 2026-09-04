@@ -186,7 +186,7 @@ description: "Task list for 002-bootstrap monorepo scaffold"
 - [X] T052 [P] Align `README.md` local-development section with host → Dev Container → kind and `pnpm verify` as definition of done
 - [X] T053 Add a test in `scripts/no-domain.test.mjs` that `apps/backend/src` and `apps/frontend/app` contain no organization/bill/user domain routes or screens (SC-005)
 - [X] T054 Confirm no CDK/EKS/Amplify/Helm/`pnpm wake` files under `deploy/` or `.github/`; `pnpm verify` via `scripts/verify.mjs` green
-- [ ] T055 Follow `specs/002-bootstrap/quickstart.md` host path once (Compose + health `ok`) as a manual check; do not require it in CI
+- [X] T055 Follow `specs/002-bootstrap/quickstart.md` host path once (Compose + health `ok`) as a manual check; do not require it in CI
 
 ---
 
