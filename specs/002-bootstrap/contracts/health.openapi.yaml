@@ -1,0 +1,54 @@
+openapi: 3.1.0
+info:
+  title: Expenses Analyzer API
+  description: >
+    Bootstrap contract for slice 002. Health/scaffold only. Nest `@nestjs/swagger`
+    is the runtime source; this file is the planning contract implement must match
+    when exporting `packages/api-client/openapi.json`.
+  version: 0.0.0
+servers:
+  - url: http://localhost:3001
+    description: Host and Dev Container Nest
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      summary: Liveness and PostgreSQL ping
+      description: >
+        Returns ok when the process can ping PostgreSQL 18. Must not include
+        organization, bill, or user fields.
+      tags:
+        - health
+      responses:
+        "200":
+          description: Nest is up and the database ping succeeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: ok
+        "503":
+          description: Database ping failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: error
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - ok
+            - error
+tags:
+  - name: health
+    description: Non-domain liveness/readiness

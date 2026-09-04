@@ -19,7 +19,7 @@ This README is the human entrypoint for the reboot. Global product rules: [`docs
 
 ## Status
 
-This repo is a **full rewrite** (greenfield monorepo). Application packages (`apps/`, `pnpm verify`) are **not scaffolded yet**. Do not revive the old Go tree unless a current spec says so.
+This repo is a **full rewrite** (greenfield monorepo). Application packages live under `apps/` and `packages/`. Definition of done is **`pnpm verify`**.
 
 ## Table of contents
 
@@ -40,7 +40,7 @@ See [`STACK.md`](STACK.md) for the full decision table. Short version:
 
 | Area | Choice |
 | --- | --- |
-| Runtime | Node.js 24, TypeScript |
+| Runtime | Node.js 24, TypeScript 6.0.3 |
 | Backend | NestJS 11 + TypeORM → PostgreSQL 18 |
 | Frontend | Next.js (React 19) on AWS Amplify |
 | API contract | OpenAPI from Nest → Orval client (`packages/api-client`) |
@@ -279,33 +279,78 @@ fix the form so that test passes. Run pnpm verify when done.
 
 ## Local development
 
-**Preferred order** after bootstrap: **host** → **Dev Container** → **kind**.
+**Preferred order:** **host** → **Dev Container** → **kind**. Do not run these paths at the same time.
 
-1. **Host (default):** Node + pnpm on your machine. **Docker Compose runs PostgreSQL 18 only.** Start Nest and Next locally; they talk to that Postgres. No Dev Container required.
-2. **Dev Container (optional):** [`.devcontainer/`](.devcontainer/) — Cursor, VS Code, or WebStorm Remote Dev. Nest and Next **inside** the container; **same Compose Postgres-only**.
-   - **Cursor CLI (`agent`) login** if you use the Cursor agent CLI in the container:
-     - Post-create installs `agent` into `~/.local/bin`.
-     - New terminal, then:
+Definition of done: **`pnpm verify`** (lint → typecheck → test). It does **not** start Compose or kind.
+
+```bash
+pnpm install
+pnpm verify
+```
+
+Host and Dev Container share the repo (and `node_modules`). After installing inside the Linux container, run **`pnpm install` again on the Mac** (or vice versa) so native packages like esbuild match the current OS — or rely on `supportedArchitectures` in `pnpm-workspace.yaml` (darwin + linux) after a fresh install.
+
+### 1. Host + Compose Postgres (default)
+
+Nest and Next run on the host. Docker Compose runs **PostgreSQL 18.4 only**.
+
+```bash
+cp .env.backend.example .env.backend
+cp .env.frontend.example .env.frontend
+docker compose up -d
+pnpm --filter @expenses/backend start:dev
+pnpm --filter @expenses/frontend dev
+```
+
+- Backend: `http://localhost:3001/health` → `{"status":"ok"}`
+- Frontend: `http://localhost:3000`
+- `DATABASE_HOST=localhost` (published `5432`)
+- Dummy credentials only (`expenses` / `expenses`); never commit real `.env` files
+
+### 2. Dev Container + Compose Postgres (optional)
+
+[`.devcontainer/`](.devcontainer/) — Cursor, VS Code, or WebStorm Remote Dev. Nest and Next **inside** the container; **same** root `compose.yaml` Postgres (not the Dev Container as the database). Forward **3000 / 3001** only (Nest/Next). Do **not** forward **5432** from the Dev Container — Compose already publishes Postgres on the host, and an IDE forward of `5432` fights that publish (JetBrains/VS Code) and yields `Connection terminated unexpectedly` from `pg`. Docker-outside-of-Docker (`docker.sock` + Docker CLI in the image) lets Compose and kind use **Docker Desktop on the host**. `DATABASE_HOST=host.docker.internal` (`containerEnv`). The Dev Container is **not** required for the host path.
+
+**First-time / after Dev Container config changes:** start **Docker Desktop** on the Mac, then **rebuild** the Dev Container (so `/var/run/docker.sock` is mounted and the image includes the Docker CLI). Then inside the container:
+
+```bash
+echo "$DATABASE_HOST"   # expect: host.docker.internal (not localhost)
+docker version
+docker compose up -d
+pnpm --filter @expenses/backend start:dev
+pnpm --filter @expenses/frontend dev
+```
+
+If Nest still fails with Postgres `Connection terminated unexpectedly`: in the IDE **Ports** UI, stop any forward of **5432**, then retry. Rebuild after this change so `forwardPorts` no longer includes `5432`.
+
+- **Cursor CLI (`agent`) login** if you use the Cursor agent CLI in the container:
+  - Post-create installs `agent` into `~/.local/bin`.
+  - New terminal, then:
 
 ```bash
 agent login
 ```
 
-     - Check: `agent --version`.
-3. **kind (optional):** **`pnpm local:up`** → Postgres, Nest, and Next as **pods**; wait until ready; `local:down` / `local:status`.
-4. Hosted first deploy is later (`011`). POC wake/sleep is after that (`010`). Never commit secrets or `.env` files with credentials.  
-5. Definition of done: **`pnpm verify`** (and CI on the PR). `pnpm verify` does not require Compose or kind to be running.
+  - Check: `agent --version`.
 
-Until bootstrap lands, there is no `pnpm verify` or `apps/` tree yet—use Spec Kit example A above to create them.
+### 3. kind (optional)
+
+Works on the **Mac host** and in the **Dev Container**. `pnpm local:*` installs `kind` + `kubectl` into `~/.local/bin` when missing (darwin or linux). Requires **Docker Desktop**. Stop Compose first (`docker compose down`). Ready-check uses **in-cluster** `kubectl exec` (not host `:8081`), so IDE port forwards cannot break `local:up`. Open **8080/8081 in the Mac browser**; if the IDE auto-forwarded those ports, stop/ignore them (`onAutoForward: ignore` in `.devcontainer`).
+
+**`pnpm local:up`** → Postgres, Nest, and Next as **pods**; wait until health is 200; prints URLs on **8080** (frontend) and **8081** (backend). `pnpm local:status` / `pnpm local:down` (idempotent).
+
+Hosted first deploy is later (`011`). POC wake/sleep is after that (`010`). Never commit secrets or `.env` files with credentials.
 
 ## Repo map (target)
 
 ```text
-apps/backend          NestJS API
-apps/frontend         Next.js UI
+apps/backend          NestJS API (`GET /health`)
+apps/frontend         Next.js scaffold UI
 packages/api-client   Orval-generated OpenAPI client
+compose.yaml          PostgreSQL 18.4 only (host / Dev Container)
+deploy/kind           kind cluster config
+deploy/kustomize      Nest base + kind overlay (Postgres + Nest + Next)
 docs/PRODUCT.md       Global product / business rules (canonical)
-deploy/               Kustomize overlays (kind, dev, staging, prod) — when added
 specs/                Feature specs (Spec Kit); align with PRODUCT.md
 .specify/             Spec Kit templates, constitution, scripts
 STACK.md              Locked stack decisions
@@ -321,7 +366,7 @@ AGENTS.md             Agent / SDD entrypoint
 ## Where to go next
 
 1. [`docs/PRODUCT.md`](docs/PRODUCT.md) is **Approved**. Delivery slices: [`specs/README.md`](specs/README.md).  
-2. **`002-bootstrap` is Approved.** Next: `/speckit-plan` for bootstrap.  
+2. **`002-bootstrap` is implemented.** Use `/speckit-converge` if something from the spec is still missing.  
 3. Implement only from approved feature specs.
 
 ## Contributing

@@ -31,6 +31,6 @@
 
 ## Notes
 
-- Status is **Approved**. Next: `/speckit-plan` for this slice.
+- Status is **Approved**. Next: `/speckit-implement` (optional `/speckit-analyze` first).
 - Depends on approved STACK.md; defers AWS first deploy to `011-aws-deploy`.
 - Local in this order: **host** + Compose Postgres only → **Dev Container** → **kind** (`pnpm local:up`).

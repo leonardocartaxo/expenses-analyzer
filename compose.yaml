@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:18.4
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: expenses
+      POSTGRES_PASSWORD: expenses
+      POSTGRES_DB: expenses
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U expenses -d expenses']
+      interval: 5s
+      timeout: 5s
+      retries: 5

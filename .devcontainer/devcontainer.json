@@ -5,17 +5,28 @@
   },
   "runArgs": [
     "--name",
-    "expenses-analyzer-dev"
+    "expenses-analyzer-dev",
+    "--add-host=host.docker.internal:host-gateway"
   ],
+  "forwardPorts": [3000, 3001],
+  "portsAttributes": {
+    "8080": { "label": "kind-frontend", "onAutoForward": "ignore" },
+    "8081": { "label": "kind-backend", "onAutoForward": "ignore" }
+  },
   "remoteUser": "node",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "mounts": [
     "source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,type=bind,readonly",
-    "source=/run/host-services/ssh-auth.sock,target=/ssh-agent,type=bind"
+    "source=/run/host-services/ssh-auth.sock,target=/ssh-agent,type=bind",
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
   ],
+  "containerEnv": {
+    "DATABASE_HOST": "host.docker.internal"
+  },
   "remoteEnv": {
-    "SSH_AUTH_SOCK": "/ssh-agent"
+    "SSH_AUTH_SOCK": "/ssh-agent",
+    "DATABASE_HOST": "host.docker.internal"
   },
   "customizations": {
     "vscode": {

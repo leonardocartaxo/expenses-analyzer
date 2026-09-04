@@ -9,7 +9,7 @@ These folders are **feature specs** (what/why + acceptance). They MUST align wit
 
 | Order | Slice | Intent | Status |
 | --- | --- | --- | --- |
-| 1 | [`002-bootstrap`](002-bootstrap/spec.md) | Scaffold monorepo + `pnpm verify`. No expenses domain. | **Approved** |
+| 1 | [`002-bootstrap`](002-bootstrap/spec.md) | Scaffold monorepo + `pnpm verify`. No expenses domain. | **Approved** (spec + plan) |
 | 2 | [`011-aws-deploy`](011-aws-deploy/spec.md) | First hosted **dev**: CDK, EKS, ECR, RDS, Amplify, CI OIDC. No wake/sleep. | Draft |
 | 3 | [`003-user-auth`](003-user-auth/spec.md) | Sign up, sign in, password reset by email. | Draft |
 | 4 | [`004-organizations`](004-organizations/spec.md) | Create org, invite (Org Admin), membership, roles, leave/delete. | Draft |
@@ -20,6 +20,6 @@ These folders are **feature specs** (what/why + acceptance). They MUST align wit
 | 9 | [`009-application-admin`](009-application-admin/spec.md) | First app admin via migration script; platform admin only. | Draft |
 | 10 | [`010-poc-wake-sleep`](010-poc-wake-sleep/spec.md) | POC not 24/7: sleep stops all stoppable AWS; wake waits until ready. | Draft |
 
-**`002-bootstrap` is Approved.** Next is `/speckit-plan` for that slice. **`011-aws-deploy` is first-time AWS** (health-only is enough). **`010-poc-wake-sleep` is hosted-POC ops** after that stack exists — not a PRODUCT.md org feature. Later slices stay Draft until you approve them.
+**`002-bootstrap` spec, plan, and tasks are ready.** Next is `/speckit-implement` (optional `/speckit-analyze` first). **`011-aws-deploy` is first-time AWS** (health-only is enough). **`010-poc-wake-sleep` is hosted-POC ops** after that stack exists — not a PRODUCT.md org feature. Later slices stay Draft until you approve them.
 
 CSV templates (product artifacts, not a slice): [`docs/csv-templates/expenses-card-statement-v1.md`](../docs/csv-templates/expenses-card-statement-v1.md), [`docs/csv-templates/expenses-utility-bill-v1.md`](../docs/csv-templates/expenses-utility-bill-v1.md).
